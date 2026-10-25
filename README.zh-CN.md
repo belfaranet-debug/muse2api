@@ -173,7 +173,7 @@ docker compose up -d --build
 ### 用真实账号（浏览器 driver）
 
 1. 装好 Chromium 或 Chrome，在 `.env` 里设置 `MUSE2API_DRIVER=browser`。
-2. 从已登录 muse.ai 的浏览器导出 cookies。至少需要 `hatch_sess`、`hatch_gw`、`hatch_vml` 和 `hatch_native_auth_device`。
+2. 从已登录 muse.ai 的浏览器导出 cookies。至少需要 `hatch_sess` 和 `hatch_native_auth_device`；`hatch_gw`、`hatch_vml` 如存在会一并传递。建议导入 muse.ai 的全部 cookies（包括 `__Host-` 开头的）。
 3. 通过下面的 Admin API 示例把账号导进来。
 
 ## 接口示例
@@ -261,7 +261,7 @@ curl http://localhost:18610/v1/videos/task_xxx -H "Authorization: Bearer $KEY"
 ```bash
 curl http://localhost:18610/admin/accounts \
   -H "Authorization: Bearer $ADMIN_KEY" -H "Content-Type: application/json" \
-  -d '{"label":"acc1","cookies":{"hatch_sess":"...","hatch_gw":"...","hatch_vml":"...","hatch_native_auth_device":"..."}}'
+  -d '{"label":"acc1","cookies":{"hatch_sess":"...","hatch_native_auth_device":"..."}}'
 ```
 
 ### 接口一览

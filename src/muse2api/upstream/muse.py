@@ -24,7 +24,11 @@ SESSION_API = f"{SITE}/api/session"
 VM_WAKE_API = f"{SITE}/api/hatch/vm/wake"
 
 # Cookies that together make up a logged-in session.
-SESSION_COOKIES = ("hatch_sess", "hatch_gw", "hatch_vml", "hatch_native_auth_device")
+# Cookies an account must have. As of 2026-10 muse.ai no longer sets hatch_gw /
+# hatch_vml for every logged-in session, so they are optional: forwarded when
+# present, but not required.
+SESSION_COOKIES = ("hatch_sess", "hatch_native_auth_device")
+OPTIONAL_SESSION_COOKIES = ("hatch_gw", "hatch_vml")
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
