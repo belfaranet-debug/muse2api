@@ -347,7 +347,7 @@ def test_admin_accounts_crud(client, auth, admin):
     assert r.status_code == 200
     acc = r.json()["account"]
     assert acc["cookies"]["hatch_sess"] != "secretvalue123"
-    assert "hatch_vml" in r.json()["missing_cookies"]
+    assert r.json()["missing_cookies"] == ["hatch_native_auth_device"]
 
     r = client.patch(f"/admin/accounts/{acc['id']}", headers=admin, json={"enabled": False})
     assert r.json()["account"]["enabled"] is False
@@ -368,6 +368,7 @@ def test_admin_account_cookie_header_string(client, admin):
     masked = listed[acc_id]["cookies"]
     assert set(masked) == {"hatch_sess", "hatch_vml"}
     assert "hatch_vml" not in r.json()["missing_cookies"]
+    assert "hatch_gw" not in r.json()["missing_cookies"]
 
 
 def test_admin_account_cookie_export_list(client, admin):
@@ -502,3 +503,29 @@ async def test_load_image_ref_rejects_loopback_url():
     from muse2api.errors import InvalidRequest
     with pytest.raises(InvalidRequest):
         await load_image_ref("http://127.0.0.1:9999/x.png", timeout=5)
+
+
+def test_missing_session_cookies_vm_cookies_optional():
+    from muse2api.upstream.muse import missing_session_cookies
+
+    assert missing_session_cookies({"hatch_sess": "s", "hatch_native_auth_device": "d"}) == []
+    assert missing_session_cookies({"hatch_sess": "s"}) == ["hatch_native_auth_device"]
+
+
+async def test_browser_set_cookies_host_prefix_uses_url():
+    from muse2api.accounts import Account
+    from muse2api.drivers.browser.driver import BrowserDriver
+
+    sent = []
+
+    class FakeSession:
+        async def send(self, method, params=None):
+            sent.append((method, params))
+
+    acc = Account(cookies={"hatch_sess": "s", "__Host-hatch_one_tap": "t"})
+    await BrowserDriver._set_cookies(FakeSession(), acc)
+    by_name = {p["name"]: p for _, p in sent}
+    assert by_name["hatch_sess"]["domain"] == ".muse.ai"
+    host = by_name["__Host-hatch_one_tap"]
+    assert "domain" not in host
+    assert host["url"] == "https://muse.ai/" and host["path"] == "/" and host["secure"]

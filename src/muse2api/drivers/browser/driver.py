@@ -283,6 +283,10 @@ class BrowserDriver(MuseDriver):
                 # Never hand Chromium a past expiry; it would drop the cookie silently.
                 "expires": exp if exp > floor else time.time() + 7 * 86400,
             }
+            if name.startswith("__Host-"):
+                # Chromium rejects __Host- cookies that carry a Domain attribute.
+                params.pop("domain")
+                params["url"] = "https://muse.ai/"
             await session.send("Network.setCookie", params)
 
     @staticmethod
