@@ -173,7 +173,7 @@ docker compose up -d --build
 ### Use a real account (browser driver)
 
 1. Install Chromium or Chrome and set `MUSE2API_DRIVER=browser` in `.env`.
-2. Export the cookies from a browser that is logged in to muse.ai. At least `hatch_sess`, `hatch_gw`, `hatch_vml` and `hatch_native_auth_device` are required.
+2. Export the cookies from a browser that is logged in to muse.ai. At least `hatch_sess` and `hatch_native_auth_device` are required; `hatch_gw` and `hatch_vml` are passed through when present. Import all muse.ai cookies, including `__Host-` ones.
 3. Import the account through the Admin API (see the example below).
 
 ## API examples
@@ -261,7 +261,7 @@ curl http://localhost:18610/v1/videos/task_xxx -H "Authorization: Bearer $KEY"
 ```bash
 curl http://localhost:18610/admin/accounts \
   -H "Authorization: Bearer $ADMIN_KEY" -H "Content-Type: application/json" \
-  -d '{"label":"acc1","cookies":{"hatch_sess":"...","hatch_gw":"...","hatch_vml":"...","hatch_native_auth_device":"..."}}'
+  -d '{"label":"acc1","cookies":{"hatch_sess":"...","hatch_native_auth_device":"..."}}'
 ```
 
 ### Endpoints

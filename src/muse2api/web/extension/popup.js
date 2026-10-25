@@ -17,7 +17,8 @@ const STORE_KEY = "muse2api_ext_cfg";
 const LANG_KEY = "muse2api_ext_lang";
 
 // Core httpOnly cookies required for generation.
-const ESSENTIAL = ["hatch_sess", "hatch_gw", "hatch_vml", "hatch_native_auth_device"];
+// hatch_gw / hatch_vml are optional: muse.ai no longer sets them for every session.
+const ESSENTIAL = ["hatch_sess", "hatch_native_auth_device"];
 
 // ---- i18n ----
 const LANG_STRINGS = {

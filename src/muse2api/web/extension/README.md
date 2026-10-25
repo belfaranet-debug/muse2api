@@ -6,8 +6,8 @@ click.
 
 ## Why this is needed
 
-The four core muse.ai cookies (`hatch_sess`, `hatch_gw`, `hatch_vml`,
-`hatch_native_auth_device`) are all `httpOnly`, which means regular web-page
+The core muse.ai cookies (`hatch_sess`, `hatch_native_auth_device`, plus
+`hatch_gw` / `hatch_vml` when muse.ai sets them) are all `httpOnly`, which means regular web-page
 JavaScript cannot read them. Only a browser extension with the `cookies`
 permission can access them.
 
@@ -49,7 +49,8 @@ expiry.
 
 ## Cookie lifetime
 
-The shortest-lived core cookie is `hatch_vml`, which expires in roughly 2 days.
+When present, the shortest-lived core cookie is `hatch_vml` (roughly 2 days);
+otherwise `hatch_sess` (roughly 30 days).
 Re-import (one click) when the Accounts page shows an expiry warning.
 
 ## Languages
