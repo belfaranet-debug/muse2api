@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -347,46 +347,46 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
 <!-- login screen -->
 <div class="login" id="login" hidden>
   <div class="login-card">
-    <div class="wordmark"><span class="glyph">m2a</span><span>muse2api<small>Bảng điều khiển quản trị</small></span></div>
-    <h1>Đăng nhập</h1>
-    <p>Nhập admin key (<span class="mono">MUSE2API_ADMIN_KEY</span>). Key được lưu trong local storage của trình duyệt này.</p>
+    <div class="wordmark"><span class="glyph">m2a</span><span>muse2api<small>Admin console</small></span></div>
+    <h1>Sign in</h1>
+    <p>Enter the admin key. If <span class="mono">MUSE2API_ADMIN_KEY</span> is not set, it is the API key in <span class="mono">data/api_key</span> next to the server. This browser remembers it in local storage after you sign in.</p>
     <form id="login-form" autocomplete="on">
       <input type="text" name="username" value="admin" autocomplete="username" hidden>
       <label class="f">Admin key<input type="password" id="login-key" autocomplete="current-password" required></label>
       <div class="errbox" id="login-err" hidden></div>
-      <button class="btn primary" type="submit" id="login-btn">Đăng nhập</button>
+      <button class="btn primary" type="submit" id="login-btn">Sign in</button>
     </form>
   </div>
 </div>
 
 <div class="app" id="app" hidden>
-  <aside class="side" id="side" aria-label="Điều hướng">
+  <aside class="side" id="side" aria-label="Navigation">
     <div class="wordmark"><span class="glyph" aria-hidden="true">m2a</span><span>muse2api<small id="version">admin</small></span></div>
     <div class="health" id="health" role="status" aria-live="polite">
-      <span class="pulse" id="health-dot"></span><b id="health-text">Đang kiểm tra…</b><small id="health-sub">&nbsp;</small>
+      <span class="pulse" id="health-dot"></span><b id="health-text">Checking…</b><small id="health-sub">&nbsp;</small>
     </div>
     <nav>
-      <div class="navlabel">Quản lý</div>
-      <a href="#overview" data-page="overview"><svg class="i"><use href="#i-overview"/></svg>Tổng quan</a>
+      <div class="navlabel">Manage</div>
+      <a href="#overview" data-page="overview"><svg class="i"><use href="#i-overview"/></svg>Overview</a>
       <a href="#accounts" data-page="accounts"><svg class="i"><use href="#i-accounts"/></svg>Accounts<span class="count" id="nav-accounts"></span></a>
       <a href="#keys" data-page="keys"><svg class="i"><use href="#i-keys"/></svg>API Keys<span class="count" id="nav-keys"></span></a>
       <a href="#requests" data-page="requests"><svg class="i"><use href="#i-requests"/></svg>Requests</a>
     </nav>
     <div class="side-foot">
-      <div class="themes" role="group" aria-label="Giao diện">
-        <button type="button" data-theme="auto" title="Theo hệ thống" aria-label="Theo hệ thống"><svg class="i"><use href="#i-auto"/></svg></button>
-        <button type="button" data-theme="light" title="Sáng" aria-label="Sáng"><svg class="i"><use href="#i-sun"/></svg></button>
-        <button type="button" data-theme="dark" title="Tối" aria-label="Tối"><svg class="i"><use href="#i-moon"/></svg></button>
+      <div class="themes" role="group" aria-label="Theme">
+        <button type="button" data-theme="auto" title="Follow system" aria-label="Follow system"><svg class="i"><use href="#i-auto"/></svg></button>
+        <button type="button" data-theme="light" title="Light" aria-label="Light"><svg class="i"><use href="#i-sun"/></svg></button>
+        <button type="button" data-theme="dark" title="Dark" aria-label="Dark"><svg class="i"><use href="#i-moon"/></svg></button>
       </div>
-      <button type="button" class="logout" id="signout"><svg class="i"><use href="#i-logout"/></svg>Đăng xuất</button>
+      <button type="button" class="logout" id="signout"><svg class="i"><use href="#i-logout"/></svg>Sign out</button>
     </div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
   <div class="shell">
     <header class="topbar">
-      <button type="button" class="burger" id="burger" aria-label="Mở menu" aria-controls="side" aria-expanded="false"><svg class="i"><use href="#i-menu"/></svg></button>
-      <span class="title" id="top-title">Tổng quan</span>
+      <button type="button" class="burger" id="burger" aria-label="Open menu" aria-controls="side" aria-expanded="false"><svg class="i"><use href="#i-menu"/></svg></button>
+      <span class="title" id="top-title">Overview</span>
       <span class="pulse" id="top-dot" aria-hidden="true"></span>
     </header>
 
@@ -394,25 +394,25 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       <!-- overview -->
       <section class="page" id="page-overview" hidden>
         <div class="page-head">
-          <div class="grow"><h1>Tổng quan</h1><div class="sub">Lưu lượng <span class="mono">/v1/*</span>, không tính các lần poll task.</div></div>
+          <div class="grow"><h1>Overview</h1><div class="sub">Traffic on <span class="mono">/v1/*</span>, excluding task polls.</div></div>
           <div class="tools">
-            <div class="seg" id="window" role="group" aria-label="Khoảng thời gian">
+            <div class="seg" id="window" role="group" aria-label="Time range">
               <button type="button" data-w="1h" aria-pressed="false">1h</button>
               <button type="button" data-w="24h" aria-pressed="true">24h</button>
               <button type="button" data-w="7d" aria-pressed="false">7d</button>
             </div>
-            <button class="btn" id="ov-refresh" type="button"><svg class="i"><use href="#i-refresh"/></svg>Làm mới</button>
+            <button class="btn" id="ov-refresh" type="button"><svg class="i"><use href="#i-refresh"/></svg>Refresh</button>
           </div>
         </div>
         <div class="tiles" id="tiles"></div>
-        <h2>Requests theo thời gian</h2>
+        <h2>Requests over time</h2>
         <div class="panel pad">
           <div id="chart"></div>
-          <div class="legend"><span><i style="background: var(--bar)"></i>Thành công</span><span><i style="background: var(--bar-err)"></i>Lỗi (4xx/5xx hoặc task failed)</span><span id="bucket-note"></span></div>
+          <div class="legend"><span><i style="background: var(--bar)"></i>Succeeded</span><span><i style="background: var(--bar-err)"></i>Errors (4xx/5xx or failed tasks)</span><span id="bucket-note"></span></div>
         </div>
         <div class="grid2" style="margin-top: 10px;">
-          <div class="panel"><div class="cardhead">Top API keys<a class="link" href="#keys">Quản lý keys</a></div><div class="list" id="ov-keys"></div></div>
-          <div class="panel"><div class="cardhead">Accounts<a class="link" href="#accounts">Xem tất cả</a></div><div class="list" id="ov-accounts"></div></div>
+          <div class="panel"><div class="cardhead">Top API keys<a class="link" href="#keys">Manage keys</a></div><div class="list" id="ov-keys"></div></div>
+          <div class="panel"><div class="cardhead">Accounts<a class="link" href="#accounts">View all</a></div><div class="list" id="ov-accounts"></div></div>
           <div class="panel"><div class="cardhead">Theo model</div><div class="list" id="ov-models"></div></div>
           <div class="panel"><div class="cardhead">Theo status code</div><div class="list" id="ov-status"></div></div>
         </div>
@@ -421,22 +421,22 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       <!-- accounts -->
       <section class="page" id="page-accounts" hidden>
         <div class="page-head">
-          <div class="grow"><h1>Accounts</h1><div class="sub">Các tài khoản muse.ai trong pool. Account hết quota sẽ tự quay lại khi hết thời gian nghỉ.</div></div>
+          <div class="grow"><h1>Accounts</h1><div class="sub">muse.ai accounts in the pool. An account that runs out of quota comes back when its cooldown ends.</div></div>
           <div class="tools">
-            <button class="btn" id="acc-refresh" type="button"><svg class="i"><use href="#i-refresh"/></svg>Làm mới</button>
-            <button class="btn" id="acc-ext-dl" type="button" title="Tải extension Chrome để import cookie muse.ai"><svg class="i" viewBox="0 0 24 24"><path d="M12 15l-4-4h3V4h2v7h3l-4 4z"/><path d="M5 18h14v2H5z"/></svg>Tải extension</button>
-            <button class="btn" id="acc-bulk-toggle" type="button" title="Import nhiều cookie cùng lúc">Import hàng loạt</button>
+            <button class="btn" id="acc-refresh" type="button"><svg class="i"><use href="#i-refresh"/></svg>Refresh</button>
+            <button class="btn" id="acc-ext-dl" type="button" title="Download the Chrome extension to import muse.ai cookies"><svg class="i" viewBox="0 0 24 24"><path d="M12 15l-4-4h3V4h2v7h3l-4 4z"/><path d="M5 18h14v2H5z"/></svg>Download extension</button>
+            <button class="btn" id="acc-bulk-toggle" type="button" title="Import many cookies at once">Bulk import</button>
           </div>
         </div>
         <div class="summary" id="acc-summary"></div>
         <div class="cards" id="accounts"></div>
         <div class="bulk-import panel pad" id="bulk-import" hidden>
-          <h2 style="margin-top:0">Import cookie hàng loạt</h2>
-          <p style="font-size:13px;color:var(--muted);margin:0 0 10px">Dán cookie string vào đây (một account mỗi dòng, định dạng <span class="mono">tên | hatch_sess=...; hatch_gw=...;</span> hoặc chỉ chuỗi cookie). POST tới <span class="mono">/admin/accounts/import</span>.</p>
+          <h2 style="margin-top:0">Bulk cookie import</h2>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 10px">Paste cookie strings here, one account per line, as <span class="mono">name | hatch_sess=...; hatch_gw=...;</span> or a bare cookie string. Sent to <span class="mono">/admin/accounts/import</span>.</p>
           <textarea id="bulk-cookies" placeholder="acc-01 | hatch_sess=...; hatch_gw=...; hatch_vml=...&#10;acc-02 | hatch_sess=...; hatch_gw=...;"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
             <button class="btn primary" id="bulk-import-btn" type="button">Import</button>
-            <button class="btn ghost" id="bulk-cancel-btn" type="button">Đóng</button>
+            <button class="btn ghost" id="bulk-cancel-btn" type="button">Close</button>
             <span id="bulk-result" class="result" hidden></span>
           </div>
         </div>
@@ -445,8 +445,8 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       <!-- keys -->
       <section class="page" id="page-keys" hidden>
         <div class="page-head">
-          <div class="grow"><h1>API Keys</h1><div class="sub">Key cho client gọi <span class="mono">/v1/*</span>. Server chỉ lưu bản băm — key chỉ hiển thị một lần khi cấp.</div></div>
-          <div class="tools"><button class="btn primary big" id="key-new" type="button"><svg class="i"><use href="#i-plus"/></svg>Cấp API key</button></div>
+          <div class="grow"><h1>API Keys</h1><div class="sub">Keys clients use for <span class="mono">/v1/*</span>. The server stores only a hash — the key is shown once, when it is issued.</div></div>
+          <div class="tools"><button class="btn primary big" id="key-new" type="button"><svg class="i"><use href="#i-plus"/></svg>Issue API key</button></div>
         </div>
         <div class="tiles" id="key-tiles" style="margin-bottom: 12px;"></div>
         <div class="panel">
@@ -459,27 +459,27 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
             </table>
           </div>
         </div>
-        <p class="muted" style="font-size: 12px; margin: 8px 2px 0;">Số liệu lấy từ request log (giữ lại theo cấu hình retention), không tính poll. Bấm vào một dòng để xem requests của key đó.</p>
+        <p class="muted" style="font-size: 12px; margin: 8px 2px 0;">Figures come from the request log (kept for the configured retention period) and exclude polls. Click a row to see that key's requests.</p>
       </section>
 
       <!-- requests -->
       <section class="page" id="page-requests" hidden>
         <div class="page-head">
-          <div class="grow"><h1>Requests</h1><div class="sub">Nhật ký từng request tới <span class="mono">/v1/*</span>. Bấm một dòng để xem chi tiết.</div></div>
-          <div class="tools"><label class="chk"><input type="checkbox" id="f-live" checked> <span class="livedot on" id="live-dot"></span> Tự động làm mới</label></div>
+          <div class="grow"><h1>Requests</h1><div class="sub">A log of each request to <span class="mono">/v1/*</span>. Click a row for details.</div></div>
+          <div class="tools"><label class="chk"><input type="checkbox" id="f-live" checked> <span class="livedot on" id="live-dot"></span> Auto refresh</label></div>
         </div>
         <div class="filters">
           <select id="f-key" aria-label="Key"></select>
           <select id="f-account" aria-label="Account"></select>
           <select id="f-status" aria-label="Status">
-            <option value="">Mọi status</option>
+            <option value="">Any status</option>
             <option value="2xx">2xx</option>
             <option value="4xx">4xx</option>
             <option value="5xx">5xx</option>
-            <option value="failed">Lỗi (gồm task failed)</option>
+            <option value="failed">Errors (including failed tasks)</option>
           </select>
-          <input type="text" id="f-path" placeholder="Path, ví dụ /v1/chat" aria-label="Path prefix">
-          <label class="chk"><input type="checkbox" id="f-polls" checked> Ẩn poll</label>
+          <input type="text" id="f-path" placeholder="Path, e.g. /v1/chat" aria-label="Path prefix">
+          <label class="chk"><input type="checkbox" id="f-polls" checked> Hide polls</label>
           <span id="f-chips" class="row"></span>
         </div>
         <div class="panel">
@@ -494,8 +494,8 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
           </div>
           <div class="pager">
             <span id="req-range"></span>
-            <button class="btn sm" id="req-prev" type="button">Mới hơn</button>
-            <button class="btn sm" id="req-next" type="button">Cũ hơn</button>
+            <button class="btn sm" id="req-prev" type="button">Newer</button>
+            <button class="btn sm" id="req-next" type="button">Older</button>
           </div>
         </div>
       </section>
@@ -518,7 +518,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   const STORE = "muse2api.adminKey";
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const PAGES = {overview: "Tổng quan", accounts: "Accounts", keys: "API Keys", requests: "Requests"};
+  const PAGES = {overview: "Overview", accounts: "Accounts", keys: "API Keys", requests: "Requests"};
   const state = {
     page: "overview", window: "24h", offset: 0, limit: 50,
     accounts: [], keys: [], builtin: [], capabilities: {}, timer: null, modalOpen: false,
@@ -539,13 +539,13 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   const fmtPct = (r) => `${(r * 100).toFixed(r && r < 0.1 ? 2 : 1)}%`;
   const icon = (name) => `<svg class="i"><use href="#i-${name}"/></svg>`;
   function ago(ts) {
-    if (!ts) return "chưa dùng";
+    if (!ts) return "never used";
     const s = Math.max(0, now() - ts);
-    if (s < 10) return "vừa xong";
-    if (s < 60) return `${Math.floor(s)} giây trước`;
-    if (s < 3600) return `${Math.floor(s / 60)} phút trước`;
-    if (s < 86400) return `${Math.floor(s / 3600)} giờ trước`;
-    return `${Math.floor(s / 86400)} ngày trước`;
+    if (s < 10) return "just now";
+    if (s < 60) return `${Math.floor(s)}s ago`;
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
   }
   function countdown(sec) {
     sec = Math.max(0, Math.ceil(sec));
@@ -578,7 +578,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     return a && a.label ? a.label : id;
   }
   function keyLabel(id, fallback) {
-    if (!id) return fallback || "(không xác thực)";
+    if (!id) return fallback || "(unauthenticated)";
     const k = state.keys.find((x) => x.id === id);
     return k ? k.name : (fallback || id);
   }
@@ -605,7 +605,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   async function guarded(fn) {
     try { return await fn(); }
     catch (e) {
-      if (e instanceof AuthError) { setKey(""); stop(); showLogin("Admin key không hợp lệ hoặc đã bị đổi."); }
+      if (e instanceof AuthError) { setKey(""); stop(); showLogin("Admin key is invalid or has changed."); }
       else toast(e.message || String(e));
     }
   }
@@ -681,9 +681,9 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       if (focus) focus.focus();
     });
   }
-  const confirmBox = (title, html, label = "Xác nhận", danger = true) => modal({
+  const confirmBox = (title, html, label = "Confirm", danger = true) => modal({
     title, body: html,
-    actions: [{label: "Huỷ", value: null}, {label, value: true, primary: true, cls: danger ? "danger solid" : "primary"}],
+    actions: [{label: "Cancel", value: null}, {label, value: true, primary: true, cls: danger ? "danger solid" : "primary"}],
   });
 
   // ---- login ----
@@ -702,21 +702,21 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     $("#login-btn").disabled = true;
     setKey(key);
     try { await api("/admin/status"); start(); }
-    catch (err) { setKey(""); showLogin(err instanceof AuthError ? "Admin key không đúng." : err.message); }
+    catch (err) { setKey(""); showLogin(err instanceof AuthError ? "Admin key is incorrect." : err.message); }
     finally { $("#login-btn").disabled = false; }
   });
 
   // ---- shared status / health ----
   function updateHealth(st, failed) {
-    let cls = "ok", text = "Hoạt động", sub = "";
-    if (failed) { cls = "err"; text = "Mất kết nối"; sub = "Không gọi được /admin/status"; }
+    let cls = "ok", text = "Healthy", sub = "";
+    if (failed) { cls = "err"; text = "Disconnected"; sub = "Could not reach /admin/status"; }
     else {
       const pool = st.accounts || {}, drv = st.driver || {};
-      sub = `${fmtNum(pool.available)}/${fmtNum(pool.total)} accounts sẵn sàng`;
-      if (drv.ok === false) { cls = "err"; text = "Driver lỗi"; sub = `driver ${drv.driver || ""}`; }
-      else if (!pool.total) { cls = "warn"; text = "Chưa có account"; }
-      else if (!pool.available) { cls = "warn"; text = "Không account nào sẵn sàng"; }
-      else if (pool.available < pool.total) { text = "Hoạt động"; }
+      sub = `${fmtNum(pool.available)}/${fmtNum(pool.total)} accounts ready`;
+      if (drv.ok === false) { cls = "err"; text = "Driver error"; sub = `driver ${drv.driver || ""}`; }
+      else if (!pool.total) { cls = "warn"; text = "No accounts"; }
+      else if (!pool.available) { cls = "warn"; text = "No account is ready"; }
+      else if (pool.available < pool.total) { text = "Healthy"; }
     }
     for (const d of [$("#health-dot"), $("#top-dot")]) d.className = `pulse ${cls}`;
     $("#health-text").textContent = text;
@@ -738,20 +738,20 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const nav = $("#nav-accounts");
     nav.textContent = total ? (ready < total ? `${ready}/${total}` : total) : "";
     nav.classList.toggle("warn", ready < total);
-    nav.title = ready < total ? `${ready}/${total} account đang hoạt động` : "";
+    nav.title = ready < total ? `${ready}/${total} accounts active` : "";
     return st;
   }
 
   // ---- accounts ----
   const isQuota = (a) => /quota|credit|out of (usage|messages)|limit reached|exhaust/i.test(a.last_error || "");
   function accState(a, t) {
-    if (!a.enabled) return {key: "disabled", label: "đã tắt", cls: "mute", badge: "b-mute"};
-    if (a.status === "invalid") return {key: "invalid", label: "lỗi phiên", cls: "err", badge: "b-err"};
+    if (!a.enabled) return {key: "disabled", label: "disabled", cls: "mute", badge: "b-mute"};
+    if (a.status === "invalid") return {key: "invalid", label: "session error", cls: "err", badge: "b-err"};
     if (a.status === "cooling" && a.cooldown_until > t) {
-      return isQuota(a) ? {key: "quota", label: "hết quota", cls: "warn", badge: "b-warn"}
-        : {key: "cooling", label: "đang nghỉ", cls: "info", badge: "b-info"};
+      return isQuota(a) ? {key: "quota", label: "out of quota", cls: "warn", badge: "b-warn"}
+        : {key: "cooling", label: "cooling down", cls: "info", badge: "b-info"};
     }
-    return {key: "active", label: "hoạt động", cls: "ok", badge: "b-ok"};
+    return {key: "active", label: "active", cls: "ok", badge: "b-ok"};
   }
 
   // ---- quota & expiry helpers ----
@@ -776,7 +776,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       : "—";
     const agoStr = q.checked_at ? " · " + ago(q.checked_at) : "";
     const pctStr = pct != null ? ` · ${pct}%` : "";
-    return `<div class="quota-bar" title="Quota${plan ? ": " + plan : ""}${pct != null ? ", đã dùng " + pct + "%" : ""}${resetsAt ? ", reset: " + resetStr : ""}">
+    return `<div class="quota-bar" title="Quota${plan ? ": " + plan : ""}${pct != null ? ", " + pct + "% used" : ""}${resetsAt ? ", reset: " + resetStr : ""}">
       <div class="qrail"><b class="${barCls}" style="width:${barW}%"></b></div>
       <div class="qmeta"><span>${planStr}${pctStr}</span><span>reset ${resetStr}${agoStr}</span></div>
     </div>`;
@@ -790,13 +790,13 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const left = ts - now();
     const days = left / 86400;
     let cls, txt;
-    if (left <= 0) { cls = "b-err"; txt = "Cookie hết hạn"; }
-    else if (days < 1) { cls = "b-err"; txt = `Hết hạn sau ${Math.max(1, Math.floor(left / 3600))} giờ`; }
-    else if (days < 3) { cls = "b-warn"; txt = `Còn ${days.toFixed(1)} ngày`; }
-    else { cls = "b-mute"; txt = `Còn ${Math.round(days)} ngày`; }
-    return `<div class="cookie-exp" title="Cookie hết hạn: ${esc(fullTime(ts))}">
+    if (left <= 0) { cls = "b-err"; txt = "Cookie expired"; }
+    else if (days < 1) { cls = "b-err"; txt = `Expires in ${Math.max(1, Math.floor(left / 3600))}h`; }
+    else if (days < 3) { cls = "b-warn"; txt = `${days.toFixed(1)}d left`; }
+    else { cls = "b-mute"; txt = `${Math.round(days)}d left`; }
+    return `<div class="cookie-exp" title="Cookie expires: ${esc(fullTime(ts))}">
       <span class="badge plain ${cls}">${txt}</span>
-      <span>hết hạn ${esc(clock(ts))}</span>
+      <span>expires ${esc(clock(ts))}</span>
     </div>`;
   }
 
@@ -811,16 +811,16 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
           <div class="id">${esc(a.id)}</div>
         </div>
         <span class="badge ${s.badge}">${esc(s.label)}</span>
-        <label class="switch" title="${a.enabled ? "Đang bật — bấm để tắt" : "Đang tắt — bấm để bật"}"><input type="checkbox" data-act="toggle" ${a.enabled ? "checked" : ""} aria-label="Bật account ${esc(name)}"><span></span></label>
+        <label class="switch" title="${a.enabled ? "Enabled — click to disable" : "Disabled — click to enable"}"><input type="checkbox" data-act="toggle" ${a.enabled ? "checked" : ""} aria-label="Enable account ${esc(name)}"><span></span></label>
       </div>
       <dl class="metrics">
-        <div><dt>Thành công</dt><dd>${fmtNum(a.success_count)}</dd></div>
-        <div><dt>Thất bại</dt><dd>${a.fail_count ? `<span class="f">${fmtNum(a.fail_count)}</span>` : "0"}</dd></div>
-        <div><dt>Dùng lần cuối</dt><dd title="${esc(fullTime(a.last_used_at))}" data-ago="${esc(a.last_used_at || 0)}">${esc(ago(a.last_used_at))}</dd></div>
+        <div><dt>Succeeded</dt><dd>${fmtNum(a.success_count)}</dd></div>
+        <div><dt>Failed</dt><dd>${a.fail_count ? `<span class="f">${fmtNum(a.fail_count)}</span>` : "0"}</dd></div>
+        <div><dt>Last used</dt><dd title="${esc(fullTime(a.last_used_at))}" data-ago="${esc(a.last_used_at || 0)}">${esc(ago(a.last_used_at))}</dd></div>
       </dl>
       ${cooling ? `<div class="cooldown">
           <span class="t" data-until="${esc(a.cooldown_until)}">${esc(countdown(a.cooldown_until - t))}</span>
-          <span class="w"><b>${s.key === "quota" ? "Hết quota" : "Tạm nghỉ"}</b>Tự động dùng lại lúc ${esc(new Date(a.cooldown_until * 1000).toLocaleTimeString([], {hour12: false}))}</span>
+          <span class="w"><b>${s.key === "quota" ? "Out of quota" : "Cooling down"}</b>Available again at ${esc(new Date(a.cooldown_until * 1000).toLocaleTimeString([], {hour12: false}))}</span>
         </div>` : ""}
       ${quotaSection(a)}
       ${expirySection(a)}
@@ -830,12 +830,12 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       </div>` : ""}
       ${a.last_error ? `<div class="reason" title="last_error">${esc(a.last_error)}</div>` : ""}
       <div class="acc-actions">
-        ${state.capabilities.renew_session ? `<button class="btn sm" type="button" data-act="renew">Gia hạn</button>` : ""}
-        <button class="btn sm" type="button" data-act="reset" ${s.key === "active" && !a.last_error ? "disabled" : ""} title="Xoá cooldown và lỗi, đưa về trạng thái hoạt động">Đặt lại</button>
+        ${state.capabilities.renew_session ? `<button class="btn sm" type="button" data-act="renew">Renew</button>` : ""}
+        <button class="btn sm" type="button" data-act="reset" ${s.key === "active" && !a.last_error ? "disabled" : ""} title="Clear the cooldown and error, and mark the account active">Reset</button>
         <button class="btn sm ghost" type="button" data-act="requests">Requests</button>
-        <button class="btn sm ghost" type="button" data-act="quota" title="Lấy quota mới nhất từ browser driver">Quota</button>
+        <button class="btn sm ghost" type="button" data-act="quota" title="Read the latest quota from the browser driver">Quota</button>
         <span class="spacer"></span>
-        <button class="btn sm danger" type="button" data-act="delete">Xoá</button>
+        <button class="btn sm danger" type="button" data-act="delete">Delete</button>
       </div>
     </article>`;
   }
@@ -845,15 +845,15 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     for (const a of state.accounts) counts[accState(a, t).key] += 1;
     const chip = (k, label, badge) => counts[k] ? `<span class="badge ${badge}">${label} <b>${counts[k]}</b></span>` : "";
     $("#acc-summary").innerHTML = state.accounts.length ? [
-      chip("active", "Hoạt động", "b-ok"), chip("quota", "Hết quota", "b-warn"), chip("cooling", "Đang nghỉ", "b-info"),
-      chip("invalid", "Lỗi phiên", "b-err"), chip("disabled", "Đã tắt", "b-mute"),
+      chip("active", "Active", "b-ok"), chip("quota", "Out of quota", "b-warn"), chip("cooling", "Cooling down", "b-info"),
+      chip("invalid", "Session error", "b-err"), chip("disabled", "Disabled", "b-mute"),
     ].join("") : "";
     // Problems first, then by label.
     const order = {quota: 0, invalid: 1, cooling: 2, active: 3, disabled: 4};
     const list = [...state.accounts].sort((a, b) => (order[accState(a, t).key] - order[accState(b, t).key])
       || (a.label || a.id).localeCompare(b.label || b.id));
     $("#accounts").innerHTML = list.map(accountCard).join("")
-      || `<div class="panel empty">Chưa có account nào. Thêm account bằng <span class="mono">POST /admin/accounts</span> hoặc script import cookies.</div>`;
+      || `<div class="panel empty">No accounts yet. Add one with <span class="mono">POST /admin/accounts</span> or a cookie import.</div>`;
   }
   async function loadAccountsPage() { await loadAccounts(); renderAccounts(); }
 
@@ -863,7 +863,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const id = input.closest("[data-id]").dataset.id;
     guarded(async () => {
       await api(`/admin/accounts/${encodeURIComponent(id)}`, {method: "PATCH", body: {enabled: input.checked}});
-      toast(input.checked ? "Đã bật account" : "Đã tắt account");
+      toast(input.checked ? "Account enabled" : "Account disabled");
       await loadAccountsPage();
     });
   });
@@ -884,7 +884,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
           const q = res.quota || {};
           const pct = q.weekly_used_pct != null ? q.weekly_used_pct
             : (q.messages_limit ? Math.round(q.messages_used / q.messages_limit * 100) : null);
-          toast(`Quota ${q.plan || "?"}: ${pct != null ? pct + "% đã dùng" : "—"}`);
+          toast(`Quota ${q.plan || "?"}: ${pct != null ? pct + "% used" : "—"}`);
           await loadAccountsPage();
         } finally { btn.disabled = false; btn.textContent = origText; }
       });
@@ -894,15 +894,15 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       const path = `/admin/accounts/${encodeURIComponent(id)}`;
       if (act === "delete") {
         const name = a ? (a.label || a.id) : id;
-        if (!await confirmBox("Xoá account?", `<p>Xoá vĩnh viễn <b>${esc(name)}</b> (<span class="mono">${esc(id)}</span>) khỏi pool, kể cả cookies đã lưu. Lịch sử request vẫn được giữ.</p>`, "Xoá account")) return;
+        if (!await confirmBox("Delete account?", `<p>Permanently delete <b>${esc(name)}</b> (<span class="mono">${esc(id)}</span>) from the pool, including stored cookies. Request history is kept.</p>`, "Delete account")) return;
         await api(path, {method: "DELETE"});
-        toast("Đã xoá account");
+        toast("Account deleted");
       } else {
         btn.disabled = true;
         try {
           const res = await api(`${path}/${act}`, {method: "POST"});
-          if (act === "renew") toast(res.ok ? "Đã gia hạn phiên" : `Gia hạn thất bại: ${res.error || "lỗi không rõ"}`);
-          else toast("Đã đặt lại account");
+          if (act === "renew") toast(res.ok ? "Session renewed" : `Renewal failed: ${res.error || "unknown error"}`);
+          else toast("Account reset");
         } finally { btn.disabled = false; }
       }
       await loadAccountsPage();
@@ -915,8 +915,8 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     btn.disabled = true;
     try {
       const res = await fetch("/admin/extension.zip", {headers: {Authorization: `Bearer ${getKey()}`}});
-      if (res.status === 404) { toast("Server này không kèm extension"); return; }
-      if (!res.ok) { toast(`Lỗi tải extension: HTTP ${res.status}`); return; }
+      if (res.status === 404) { toast("This server does not include the extension"); return; }
+      if (!res.ok) { toast(`Failed to download the extension: HTTP ${res.status}`); return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -945,12 +945,12 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const btn = $("#bulk-import-btn");
     btn.disabled = true;
     const result = $("#bulk-result");
-    result.textContent = "Đang import…"; result.hidden = false; result.style.color = "var(--muted)";
+    result.textContent = "Importing…"; result.hidden = false; result.style.color = "var(--muted)";
     try {
       const res = await api("/admin/accounts/import", {method: "POST", body: {accounts}});
       const ok = (res.data || []).filter((r) => r.ok).length;
       const fail = (res.data || []).filter((r) => !r.ok).length;
-      result.textContent = `✓ ${ok} account import thành công${fail ? ", " + fail + " lỗi" : ""}`;
+      result.textContent = `✓ ${ok} account${ok === 1 ? "" : "s"} imported${fail ? ", " + fail + " failed" : ""}`;
       result.style.color = fail ? "var(--warn)" : "var(--ok)";
       await loadAccountsPage();
     } finally { btn.disabled = false; }
@@ -977,7 +977,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     series.forEach((p, i) => {
       const x = L + i * bw + bw * 0.14, w = Math.max(1, bw * 0.72);
       const ok = p.count - p.errors;
-      const label = `${clock(p.t)}: ${p.count} requests, ${p.errors} lỗi`;
+      const label = `${clock(p.t)}: ${p.count} requests, ${p.errors} errors`;
       if (p.count) {
         out += `<g><title>${esc(label)}</title>`;
         if (ok) out += `<rect x="${x}" y="${y(p.count)}" width="${w}" height="${y(p.errors) - y(p.count)}" fill="var(--bar)" rx="1"/>`;
@@ -992,7 +992,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
         : d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", hour12: false});
       out += `<text x="${L + i * bw + bw / 2}" y="${H - 4}" text-anchor="middle">${esc(txt)}</text>`;
     }
-    return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Requests theo thời gian">${out}</svg>`;
+    return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Requests over time">${out}</svg>`;
   }
 
   function meterList(rows, label, opts = {}) {
@@ -1004,9 +1004,9 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
         <span class="lbl" title="${esc(label(r))}">${esc(label(r))}</span>
         <span class="meter" aria-hidden="true"><b style="width:${okW}%"></b><b class="e" style="width:${errW}%"></b></span>
         <span class="n">${fmtNum(r.count)}</span>
-        <span class="n ${r.errors ? "e" : "muted"}" title="lỗi 4xx/5xx hoặc task failed">${r.errors ? `${fmtNum(r.errors)} lỗi` : "–"}</span>
+        <span class="n ${r.errors ? "e" : "muted"}" title="4xx/5xx errors or failed tasks">${r.errors ? `${fmtNum(r.errors)} errors` : "–"}</span>
       </div>`;
-    }).join("") || `<div class="empty">Chưa có request</div>`;
+    }).join("") || `<div class="empty">No requests yet</div>`;
   }
 
   function accountsSummary() {
@@ -1020,10 +1020,10 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
         <span class="dot ${s.cls}"></span>
         <span class="lbl" title="${esc(a.label || a.id)}">${esc(a.label || a.id)}</span>
         <span class="badge plain ${s.badge}">${esc(s.label)}${cool ? ` · <span class="mono" data-until="${esc(a.cooldown_until)}">${esc(countdown(a.cooldown_until - t))}</span>` : ""}</span>
-        <span class="n" title="thành công / thất bại">${fmtNum(a.success_count)}<span class="muted">/</span><span class="${a.fail_count ? "e" : "muted"}" style="${a.fail_count ? "color:var(--err)" : ""}">${fmtNum(a.fail_count)}</span></span>
+        <span class="n" title="succeeded / failed">${fmtNum(a.success_count)}<span class="muted">/</span><span class="${a.fail_count ? "e" : "muted"}" style="${a.fail_count ? "color:var(--err)" : ""}">${fmtNum(a.fail_count)}</span></span>
       </div>`;
-    }).join("") + (list.length > 7 ? `<div class="li muted" style="font-size:12px">+${list.length - 7} account khác</div>` : "")
-      || `<div class="empty">Chưa có account</div>`;
+    }).join("") + (list.length > 7 ? `<div class="li muted" style="font-size:12px">+${list.length - 7} more accounts</div>` : "")
+      || `<div class="empty">No accounts</div>`;
   }
 
   let lastStats = null, resizeTimer;
@@ -1039,19 +1039,19 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const pool = st.accounts || {};
     const activeKeys = state.keys.filter((k) => !k.revoked).length;
     $("#tiles").innerHTML = [
-      tile("Requests", fmtNum(stats.total), `${stats.window} gần nhất`),
-      tile("Tỉ lệ lỗi", fmtPct(stats.error_rate), `${fmtNum(stats.errors)} lỗi · ${fmtNum(stats.server_errors)} 5xx`, stats.error_rate >= 0.1 ? "bad" : ""),
-      tile("Độ trễ p95", fmtMs(stats.latency_ms.p95), `p50 ${fmtMs(stats.latency_ms.p50)}`),
-      tile("Accounts sẵn sàng", `${fmtNum(pool.available)}/${fmtNum(pool.total)}`, `${fmtNum(pool.inflight)} đang xử lý`, pool.total && !pool.available ? "warn" : ""),
-      tile("API keys", fmtNum(activeKeys), `đang hoạt động · ${fmtNum(state.keys.length - activeKeys)} đã thu hồi`),
+      tile("Requests", fmtNum(stats.total), `last ${stats.window}`),
+      tile("Error rate", fmtPct(stats.error_rate), `${fmtNum(stats.errors)} errors · ${fmtNum(stats.server_errors)} 5xx`, stats.error_rate >= 0.1 ? "bad" : ""),
+      tile("p95 latency", fmtMs(stats.latency_ms.p95), `p50 ${fmtMs(stats.latency_ms.p50)}`),
+      tile("Accounts ready", `${fmtNum(pool.available)}/${fmtNum(pool.total)}`, `${fmtNum(pool.inflight)} in flight`, pool.total && !pool.available ? "warn" : ""),
+      tile("API keys", fmtNum(activeKeys), `active · ${fmtNum(state.keys.length - activeKeys)} revoked`),
     ].join("");
     lastStats = stats;
     $("#chart").innerHTML = chart(stats.series, stats.bucket_seconds);
     const b = stats.bucket_seconds;
-    $("#bucket-note").textContent = `mỗi cột ${b >= 3600 ? `${b / 3600} giờ` : `${b / 60} phút`}`;
+    $("#bucket-note").textContent = `each bar ${b >= 3600 ? `${b / 3600}h` : `${b / 60}m`}`;
     $("#ov-keys").innerHTML = meterList(stats.by_key, (r) => keyLabel(r.key_id, r.key_name),
       {attrs: (r) => r.key_id ? `data-key="${esc(r.key_id)}" tabindex="0"` : ""});
-    $("#ov-models").innerHTML = meterList(stats.by_model, (r) => r.model || "(không có)");
+    $("#ov-models").innerHTML = meterList(stats.by_model, (r) => r.model || "(none)");
     $("#ov-status").innerHTML = meterList(stats.by_status, (r) => String(r.status_code));
     $("#ov-accounts").innerHTML = accountsSummary();
   }
@@ -1076,7 +1076,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   $("#ov-refresh").addEventListener("click", () => guarded(loadOverview));
 
   // ---- keys ----
-  const BUILTIN_NOTE = {legacy: "MUSE2API_API_KEY (key đơn cũ)", admin: "MUSE2API_ADMIN_KEY"};
+  const BUILTIN_NOTE = {legacy: "MUSE2API_API_KEY (legacy single key)", admin: "MUSE2API_ADMIN_KEY"};
   async function fetchKeys() {
     const res = await api("/admin/keys");
     // Active keys first; the server already orders by creation time.
@@ -1093,7 +1093,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     return `${n(u.total)} data-label="Total">${fmtNum(u.total || 0)}</td>
       ${n(u.requests_24h)} data-label="24h">${fmtNum(u.requests_24h || 0)}</td>
       ${n(u.errors_24h, "hot")} data-label="Errors 24h">${fmtNum(u.errors_24h || 0)}</td>
-      <td data-label="Last request" title="${esc(fullTime(u.last_request_at))}">${esc(u.last_request_at ? ago(u.last_request_at) : "chưa có")}</td>`;
+      <td data-label="Last request" title="${esc(fullTime(u.last_request_at))}">${esc(u.last_request_at ? ago(u.last_request_at) : "none yet")}</td>`;
   }
 
   async function loadKeys() {
@@ -1103,58 +1103,58 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     const active = state.keys.filter((k) => !k.revoked).length;
     const req24 = sum("requests_24h"), err24 = sum("errors_24h");
     $("#key-tiles").innerHTML = [
-      tile("Keys hoạt động", fmtNum(active), `${fmtNum(state.keys.length - active)} đã thu hồi`),
-      tile("Requests 24h", fmtNum(req24), "mọi key, không tính poll"),
-      tile("Lỗi 24h", fmtNum(err24), req24 ? `${fmtPct(err24 / req24)} số request` : "–", err24 && err24 / req24 >= 0.1 ? "bad" : ""),
+      tile("Active keys", fmtNum(active), `${fmtNum(state.keys.length - active)} revoked`),
+      tile("Requests 24h", fmtNum(req24), "all keys, polls excluded"),
+      tile("Errors, 24h", fmtNum(err24), req24 ? `${fmtPct(err24 / req24)} of requests` : "–", err24 && err24 / req24 >= 0.1 ? "bad" : ""),
     ].join("");
-    const statusBadgeK = (k) => k.revoked ? `<span class="badge b-err">đã thu hồi</span>` : `<span class="badge b-ok">hoạt động</span>`;
-    const rows = state.keys.map((k) => `<tr class="click" data-id="${esc(k.id)}" tabindex="0" title="Xem requests của ${esc(k.name)}">
+    const statusBadgeK = (k) => k.revoked ? `<span class="badge b-err">revoked</span>` : `<span class="badge b-ok">active</span>`;
+    const rows = state.keys.map((k) => `<tr class="click" data-id="${esc(k.id)}" tabindex="0" title="View requests for ${esc(k.name)}">
         <td class="cell-name"><div><b>${esc(k.name)}</b>${k.note ? `<div class="sub" title="${esc(k.note)}">${esc(k.note)}</div>` : ""}</div><span class="m-status">${statusBadgeK(k)}</span></td>
         <td class="mono hide-sm" data-label="Key">${esc(k.prefix)}…</td>
         <td class="cell-status" data-label="Status">${statusBadgeK(k)}</td>
         ${usageCells(k.usage)}
         <td class="hide-sm" data-label="Created" title="${esc(fullTime(k.created_at))}">${esc(ago(k.created_at))}</td>
         <td class="actions"><div class="row">
-          <button class="btn sm" type="button" data-act="edit">Đổi tên</button>
-          <button class="btn sm" type="button" data-act="${k.revoked ? "unrevoke" : "revoke"}">${k.revoked ? "Khôi phục" : "Thu hồi"}</button>
-          <button class="btn sm danger" type="button" data-act="delete">Xoá</button>
+          <button class="btn sm" type="button" data-act="edit">Rename</button>
+          <button class="btn sm" type="button" data-act="${k.revoked ? "unrevoke" : "revoke"}">${k.revoked ? "Restore" : "Revoke"}</button>
+          <button class="btn sm danger" type="button" data-act="delete">Delete</button>
         </div></td>
-      </tr>`).join("") || `<tr><td colspan="9" class="empty" style="grid-column:1/-1">Chưa có key nào. Bấm <b>Cấp API key</b> để tạo key đầu tiên.</td></tr>`;
-    const builtin = state.builtin.map((b) => `<tr class="click builtin" data-id="${esc(b.id)}" tabindex="0" title="Xem requests của ${esc(b.name)}">
-        <td class="cell-name"><div><b>${esc(b.name)}</b><div class="sub">${esc(BUILTIN_NOTE[b.id] || "")}</div></div><span class="m-status"><span class="badge b-mute">có sẵn</span></span></td>
+      </tr>`).join("") || `<tr><td colspan="9" class="empty" style="grid-column:1/-1">No keys yet. Click <b>Issue API key</b> to create the first one.</td></tr>`;
+    const builtin = state.builtin.map((b) => `<tr class="click builtin" data-id="${esc(b.id)}" tabindex="0" title="View requests for ${esc(b.name)}">
+        <td class="cell-name"><div><b>${esc(b.name)}</b><div class="sub">${esc(BUILTIN_NOTE[b.id] || "")}</div></div><span class="m-status"><span class="badge b-mute">built-in</span></span></td>
         <td class="mono hide-sm muted" data-label="Key">env</td>
-        <td class="cell-status" data-label="Status"><span class="badge b-mute">có sẵn</span></td>
+        <td class="cell-status" data-label="Status"><span class="badge b-mute">built-in</span></td>
         ${usageCells(b.usage)}
         <td class="hide-sm muted" data-label="Created">–</td>
-        <td class="actions muted" style="font-size:12px">chỉ đọc</td>
+        <td class="actions muted" style="font-size:12px">read only</td>
       </tr>`).join("");
-    $("#keys-body").innerHTML = rows + (builtin ? `<tr class="sep"><td colspan="9">Định danh có sẵn</td></tr>${builtin}` : "");
+    $("#keys-body").innerHTML = rows + (builtin ? `<tr class="sep"><td colspan="9">Built-in identities</td></tr>${builtin}` : "");
   }
 
-  async function keyForm(title, k = {}, submit = "Lưu") {
+  async function keyForm(title, k = {}, submit = "Save") {
     return modal({
       title,
-      body: `<label class="f">Tên<input type="text" id="kf-name" maxlength="100" value="${esc(k.name || "")}" placeholder="vd. alice-laptop, n8n-prod" autocomplete="off"></label>
-        <label class="f">Ghi chú <span class="hint">không bắt buộc — ai dùng, dùng cho việc gì</span><input type="text" id="kf-note" maxlength="500" value="${esc(k.note || "")}" autocomplete="off"></label>`,
-      actions: [{label: "Huỷ", value: null},
+      body: `<label class="f">Name<input type="text" id="kf-name" maxlength="100" value="${esc(k.name || "")}" placeholder="e.g. alice-laptop, n8n-prod" autocomplete="off"></label>
+        <label class="f">Note <span class="hint">optional — who uses it, and for what</span><input type="text" id="kf-note" maxlength="500" value="${esc(k.note || "")}" autocomplete="off"></label>`,
+      actions: [{label: "Cancel", value: null},
         {label: submit, primary: true, cls: "primary",
          collect: () => ({name: $("#kf-name").value.trim(), note: $("#kf-note").value.trim()}),
-         check: (v) => v.name ? "" : "Cần nhập tên cho key."}],
+         check: (v) => v.name ? "" : "A name is required."}],
     });
   }
 
   $("#key-new").addEventListener("click", () => guarded(async () => {
-    const form = await keyForm("Cấp API key mới", {}, "Cấp key");
+    const form = await keyForm("Issue a new API key", {}, "Issue key");
     if (!form) return;
     const res = await api("/admin/keys", {method: "POST", body: form});
     await loadKeys();
     await modal({
-      title: `Đã cấp key “${res.key.name}”`,
-      body: `<div class="warnbox"><b>Sao chép key ngay bây giờ.</b> Đây là lần duy nhất key được hiển thị — server chỉ lưu bản băm, không thể xem lại.</div>
-        <div class="secret"><input type="text" id="new-key" readonly value="${esc(res.api_key)}" aria-label="API key mới" spellcheck="false">
-        <button class="btn primary" type="button" id="copy-key">${icon("copy")}Sao chép</button></div>
+      title: `Issued key “${res.key.name}”`,
+      body: `<div class="warnbox"><b>Copy this key now.</b> This is the only time it is shown — the server stores only a hash and cannot show it again.</div>
+        <div class="secret"><input type="text" id="new-key" readonly value="${esc(res.api_key)}" aria-label="New API key" spellcheck="false">
+        <button class="btn primary" type="button" id="copy-key">${icon("copy")}Copy</button></div>
         <div class="usage-hint">Authorization: Bearer ${esc(res.api_key.slice(0, 12))}…</div>`,
-      actions: [{label: "Tôi đã lưu key", value: null, primary: true, cls: ""}],
+      actions: [{label: "I have saved the key", value: null, primary: true, cls: ""}],
     });
   }));
   // The copy button lives inside the modal body, which is re-rendered per modal.
@@ -1166,7 +1166,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
     let ok = false;
     try { await navigator.clipboard.writeText(input.value); ok = true; }
     catch { try { ok = document.execCommand("copy"); } catch {} }
-    btn.innerHTML = ok ? `${icon("copy")}Đã sao chép` : "Hãy copy thủ công";
+    btn.innerHTML = ok ? `${icon("copy")}Copied` : "Copy it manually";
   });
 
   function openKeyRequests(id) { go("requests", {key: id}); }
@@ -1186,25 +1186,25 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       const ident = `<b>${esc(k.name)}</b> (<span class="mono">${esc(k.prefix)}…</span>)`;
       switch (btn.dataset.act) {
         case "edit": {
-          const form = await keyForm("Đổi tên key", k);
+          const form = await keyForm("Rename key", k);
           if (!form) return;
           await api(path, {method: "PATCH", body: form});
-          toast("Đã cập nhật key");
+          toast("Key updated");
           break;
         }
         case "revoke":
-          if (!await confirmBox("Thu hồi key?", `<p>Mọi request dùng ${ident} sẽ nhận 401 cho tới khi key được khôi phục.</p>`, "Thu hồi")) return;
+          if (!await confirmBox("Revoke key?", `<p>Every request using ${ident} will get 401 until the key is restored.</p>`, "Revoke")) return;
           await api(path, {method: "PATCH", body: {revoked: true}});
-          toast("Đã thu hồi key");
+          toast("Key revoked");
           break;
         case "unrevoke":
           await api(path, {method: "PATCH", body: {revoked: false}});
-          toast("Đã khôi phục key");
+          toast("Key restored");
           break;
         case "delete":
-          if (!await confirmBox("Xoá key?", `<p>Xoá vĩnh viễn ${ident}? Client đang dùng key sẽ nhận 401. Lịch sử request vẫn được giữ trong log.</p>`, "Xoá key")) return;
+          if (!await confirmBox("Delete key?", `<p>Permanently delete ${ident}? Clients using it will get 401. Request history stays in the log.</p>`, "Delete key")) return;
           await api(path, {method: "DELETE"});
-          toast("Đã xoá key");
+          toast("Key deleted");
           break;
       }
       await loadKeys();
@@ -1215,9 +1215,9 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   function fillFilterOptions() {
     const keySel = $("#f-key"), accSel = $("#f-account");
     const keyVal = keySel.value || state.pendingKey || "", accVal = accSel.value || state.pendingAccount || "";
-    keySel.innerHTML = `<option value="">Mọi key</option><option value="legacy">legacy</option><option value="admin">admin</option>`
-      + state.keys.map((k) => `<option value="${esc(k.id)}">${esc(k.name)}${k.revoked ? " (đã thu hồi)" : ""}</option>`).join("");
-    accSel.innerHTML = `<option value="">Mọi account</option>`
+    keySel.innerHTML = `<option value="">Any key</option><option value="legacy">legacy</option><option value="admin">admin</option>`
+      + state.keys.map((k) => `<option value="${esc(k.id)}">${esc(k.name)}${k.revoked ? " (revoked)" : ""}</option>`).join("");
+    accSel.innerHTML = `<option value="">Any account</option>`
       + state.accounts.map((a) => `<option value="${esc(a.id)}">${esc(a.label || a.id)}</option>`).join("");
     for (const [sel, val] of [[keySel, keyVal], [accSel, accVal]]) {
       sel.value = val;
@@ -1235,8 +1235,8 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
   function renderChips() {
     const chips = [];
     const k = $("#f-key").value, a = $("#f-account").value;
-    if (k) chips.push(`<span class="chip">Key: ${esc(keyLabel(k, k))}<button type="button" data-clear="f-key" aria-label="Bỏ lọc key">${icon("x")}</button></span>`);
-    if (a) chips.push(`<span class="chip">Account: ${esc(accountLabel(a))}<button type="button" data-clear="f-account" aria-label="Bỏ lọc account">${icon("x")}</button></span>`);
+    if (k) chips.push(`<span class="chip">Key: ${esc(keyLabel(k, k))}<button type="button" data-clear="f-key" aria-label="Clear key filter">${icon("x")}</button></span>`);
+    if (a) chips.push(`<span class="chip">Account: ${esc(accountLabel(a))}<button type="button" data-clear="f-account" aria-label="Clear account filter">${icon("x")}</button></span>`);
     $("#f-chips").innerHTML = chips.join("");
   }
   $("#f-chips").addEventListener("click", (e) => {
@@ -1269,7 +1269,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
         <td class="num" title="${esc(r.error || "")}">${statusBadge(r.status_code)}${taskBadge(r)}</td>
         <td class="num">${esc(fmtMs(r.latency_ms))}</td>
         <td class="hide-sm mono">${esc(r.client_ip || "")}</td>
-      </tr>`).join("") || `<tr><td colspan="9" class="empty">Không có request nào khớp bộ lọc.</td></tr>`;
+      </tr>`).join("") || `<tr><td colspan="9" class="empty">No requests match the filters.</td></tr>`;
     const end = state.offset + res.data.length;
     $("#req-range").textContent = res.total ? `${state.offset + 1}–${end} / ${fmtNum(res.total)}` : "";
     $("#req-prev").disabled = state.offset === 0;
@@ -1288,7 +1288,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; font-family: var(--mono); font-si
       title: `${r.method} ${r.path}`, wide: true,
       body: `${r.error ? `<div class="errbox">${esc(r.error)}</div>` : ""}
         <dl class="kv">${fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v == null || v === "" ? "–" : v)}</dd>`).join("")}</dl>`,
-      actions: [{label: "Đóng", value: null, primary: true, cls: "primary"}],
+      actions: [{label: "Close", value: null, primary: true, cls: "primary"}],
     });
   }
   $("#req-body").addEventListener("click", (e) => {
