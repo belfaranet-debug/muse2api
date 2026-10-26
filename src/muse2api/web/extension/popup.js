@@ -211,6 +211,13 @@ async function run() {
 
     log(s("uploading", { n: names.length, base }));
 
+    const origin = new URL(base).origin + "/*";
+    const allowed = await chrome.permissions.request({ origins: [origin] });
+    if (!allowed) {
+      log("Allow the extension to access " + new URL(base).origin + ", then click again.", "bad");
+      return;
+    }
+
     const res = await fetch(base + "/admin/accounts", {
       method: "POST",
       headers: {

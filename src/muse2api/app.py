@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from . import __version__
@@ -93,4 +94,11 @@ def create_app(settings: Settings | None = None, driver: MuseDriver | None = Non
 
     app.include_router(build_router())
     app.add_middleware(RequestLogMiddleware, request_log=services.requests)
+    # The cookie-import extension calls /admin/accounts from chrome-extension://.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"chrome-extension://.*",
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return app
