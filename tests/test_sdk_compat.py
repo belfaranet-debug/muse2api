@@ -2,7 +2,8 @@
 
 The `/v1/responses` endpoint (C1) was verified by hand against openai 3.37.0;
 these tests lock that in so a future change cannot silently break SDK
-compatibility. Requires the ``openai`` package (declared in the ``dev`` extra).
+compatibility. The `/v1/images/edits` endpoint (C2) is covered the same way.
+Requires the ``openai`` package (declared in the ``dev`` extra).
 """
 
 from __future__ import annotations
@@ -27,6 +28,20 @@ async def test_sdk_responses_non_streaming(client, auth):
         assert resp.status == "completed"
         assert "sdk non-stream hello" in resp.output_text
         assert resp.usage.total_tokens > 0
+    finally:
+        await http_client.aclose()
+
+
+async def test_sdk_images_edit(client, auth):
+    token = auth["Authorization"].split(" ", 1)[1]
+    sdk, http_client = _sdk_client(client, token)
+    try:
+        resp = await sdk.images.edit(
+            image=("a.png", b"\x89PNG-sdk", "image/png"),
+            prompt="sdk edit hello",
+            response_format="b64_json",
+        )
+        assert resp.data and resp.data[0].b64_json
     finally:
         await http_client.aclose()
 

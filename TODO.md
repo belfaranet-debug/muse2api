@@ -22,7 +22,7 @@ Priorities: **P0** must be done first · **P1** core feature · **P2** better ex
 | B2 | Reuse conversation threads to cut first-token latency | P2 | `drivers/browser/` | | Done |
 | B3 | Quota lookup | P2 | `MuseDriver.quota` | | Partial (mock and browser driver done; http driver and quota-aware scheduling open) |
 | C1 | `/v1/responses` endpoint | P1 | `api/routes/responses.py` | | Done (local; verified with the official OpenAI SDK streaming + non-streaming against the mock driver; real-account check pending) |
-| C2 | `/v1/images/edits` endpoint | P1 | `api/routes/images.py` | | Not started |
+| C2 | `/v1/images/edits` endpoint | P1 | `api/routes/images.py` | | Done (SDK regression test in `tests/test_sdk_compat.py`; `mask` rejected, no inpainting) |
 | C3 | Emulated tool calling | P2 | `core/prompt.py` | | Not started |
 | C4 | Streaming heartbeats to avoid client timeouts | P2 | `api/routes/chat.py` | | Done |
 | D1 | Support more cookie import formats | P1 | `api/routes/admin.py` | | Done |
@@ -115,6 +115,7 @@ Done. A follow-up whose `messages` continue the conversation already on the page
 - Parse the multipart form (`image` / `image[]`, `prompt`, `size`, `response_format`).
 - Put the uploaded images into `ImageRequest.reference_images` and reuse the response shaping from `generate_images`.
 - **Done when**: the official SDK's `client.images.edit()` works.
+- **Done (2026-10-25)**: `POST /v1/images/edits` takes multipart `image`/`image[]` + `prompt` and reuses the generations shaping; the official SDK's `client.images.edit()` is covered by `test_sdk_images_edit` in `tests/test_sdk_compat.py`. `mask` is rejected because muse.ai cannot inpaint a region.
 
 ### C3 Emulated tool calling · P2
 - muse.ai has no native function calling. The idea is to describe the available tools and an output format in the prompt, parse tool calls out of the reply, and convert them to OpenAI's `tool_calls` format.
