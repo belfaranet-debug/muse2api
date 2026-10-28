@@ -473,14 +473,26 @@ class BrowserDriver(MuseDriver):
     async def _begin_chat(self, account: Account, req: ChatRequest):
         """Send ``req`` on the saved conversation when it continues that page."""
         hint = req.conversation_hint or ""
-        tab = await self._checkout(account, prefer=lambda t: t.has_state and (t.hint or "") == hint)
+        if hint:
+            # A named conversation reuses the tab already holding it.
+            tab = await self._checkout(account, prefer=lambda t: t.has_state and (t.hint or "") == hint)
+        else:
+            # No identity (no `user` field): never latch onto a tab another
+            # anonymous request was using, or two clients without `user`
+            # would share one thread. Prefer a fresh/stateless tab instead.
+            tab = await self._checkout(account, prefer=lambda t: not t.has_state)
         prompt, images = req.prompt, req.images
         try:
             # The saved conversation (restored after a restart) may only go into a
             # tab while no other tab of the account already holds a conversation.
             if not any(t.has_state for t in self._tabs.get(account.id, []) if t is not tab):
                 self._load_hot(tab, account)
-            same_owner = (tab.hint or "") == (req.conversation_hint or "")
+            # An anonymous request never continues a thread, even if the tab
+            # it got (e.g. the at-limit fallback, or a restored hot page)
+            # happens to hold one: without an identity there is no way to
+            # know it is the same client. It opens a new thread instead and
+            # sends the full prompt, which keeps the model in context.
+            same_owner = bool(hint) and (tab.hint or "") == hint
             follow = followup_text(tab.turns, req.turns) if tab.turns and same_owner else None
             if follow and len(req.images) >= tab.image_count and (
                 tab.thread_url or await self._live_continuation(tab)

@@ -9,6 +9,7 @@ import pytest
 
 from muse2api.accounts import Account
 from muse2api.config import Settings
+from muse2api.drivers.base import ChatRequest
 from muse2api.drivers.browser.driver import BrowserDriver, _Tab
 
 
@@ -217,3 +218,78 @@ async def test_quota_hint_only_counts_in_the_finished_reply(driver):
              "lastText": "You've reached your usage limit. Try again later.", "generating": False}
     with pytest.raises(UpstreamQuotaError, match="usage limit"):
         await driver._state(_media_tab([quota]))
+
+
+async def _run_begin_chat(driver, monkeypatch, tab, req, on_thread=True):
+    """Drive _begin_chat with CDP-touching steps stubbed; returns (sent, new_thread)."""
+    sent = []
+    new_thread = []
+
+    async def fake_new(t):
+        new_thread.append(t)
+
+    async def fake_state(t):
+        return {}
+
+    async def fake_attach(t, images):
+        pass
+
+    async def fake_send(t, prompt):
+        sent.append(prompt)
+
+    async def fake_on(t):
+        return on_thread
+
+    async def spy_checkout(account, prefer=None):
+        spy_checkout.prefer = prefer
+        return tab
+
+    monkeypatch.setattr(driver, "_checkout", spy_checkout)
+    monkeypatch.setattr(driver, "_new_thread", fake_new)
+    monkeypatch.setattr(driver, "_state", fake_state)
+    monkeypatch.setattr(driver, "_attach", fake_attach)
+    monkeypatch.setattr(driver, "_send", fake_send)
+    monkeypatch.setattr(driver, "_on_thread", fake_on)
+    await driver._begin_chat(ACC, req)
+    return sent, new_thread, spy_checkout.prefer
+
+
+async def test_anonymous_chat_prefers_a_stateless_tab(driver, monkeypatch):
+    fresh = _Tab(ACC.id, "ctx", "t0", _FakeSession())
+    sent, _, prefer = await _run_begin_chat(
+        driver, monkeypatch, fresh,
+        ChatRequest(prompt="hi", model="muse-chat", turns=[("user", "hi")]),
+    )
+    used = _Tab(ACC.id, "ctx", "t1", _FakeSession())
+    used.hint, used.turns = "", [("user", "hi")]
+    assert prefer(used) is False
+    assert prefer(fresh) is True
+    assert sent == ["hi"]  # new thread, full prompt
+
+
+async def test_anonymous_chat_never_continues_an_unowned_thread(driver, monkeypatch):
+    # History lines up with the tab's thread, but with no `user` there is no
+    # way to know it is the same client, so it must not continue it.
+    tab = _Tab(ACC.id, "ctx", "t0", _FakeSession())
+    tab.hint, tab.turns = "", [("user", "hi")]
+    tab.thread_url = "https://muse.ai/chat/abc"
+    sent, new_thread, _ = await _run_begin_chat(
+        driver, monkeypatch, tab,
+        ChatRequest(prompt="FULL", model="muse-chat",
+                    turns=[("user", "hi"), ("assistant", "hello"), ("user", "more")]),
+    )
+    assert new_thread  # opened a new thread instead of continuing
+    assert sent == ["FULL"]  # full prompt, not the "more" delta
+
+
+async def test_named_chat_still_continues_its_thread(driver, monkeypatch):
+    tab = _Tab(ACC.id, "ctx", "t0", _FakeSession())
+    tab.hint, tab.turns = "alice", [("user", "hi")]
+    tab.thread_url = "https://muse.ai/chat/abc"
+    sent, new_thread, _ = await _run_begin_chat(
+        driver, monkeypatch, tab,
+        ChatRequest(prompt="FULL", model="muse-chat", conversation_hint="alice",
+                    turns=[("user", "hi"), ("assistant", "hello"), ("user", "more")]),
+    )
+    assert not new_thread
+    assert sent == ["more"]  # only the delta, on the same thread

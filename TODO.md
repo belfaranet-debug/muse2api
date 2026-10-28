@@ -32,6 +32,9 @@ Priorities: **P0** must be done first · **P1** core feature · **P2** better ex
 | E1 | Automatic media cleanup | P2 | `core/media.py` | | Done |
 | E2 | Multiple API keys and rate limiting | P3 | `api/deps.py` | | Partial (per-key management done; rate limiting open) |
 | E3 | Observability (metrics, logs) | P3 | `observability/` (new) | | Not started |
+| F1 | Stateless-by-default chat: new thread + full history per request | P2 | `drivers/browser/driver.py` | | Deferred (2026-10-28, see §F) |
+| F2 | Stateful tab reuse as explicit opt-in (non-empty `user` only) | P2 | `drivers/browser/driver.py` | | Deferred (2026-10-28, see §F) |
+| F3 | Multi-user guidance: raise `account_max_concurrency`, isolate by API key | P3 | `config.py`, docs | | Deferred (2026-10-28, see §F) |
 
 ---
 
@@ -167,3 +170,33 @@ Done. A follow-up whose `messages` continue the conversation already on the page
 ### E3 Observability · P3
 - Expose Prometheus metrics: request count, latency, first-token latency, per-account success/failure counts, queue wait time.
 - Structured request logs with a unique ID per request for troubleshooting.
+
+---
+
+## F. Conversation state (deferred 2026-10-28)
+
+Background: the browser driver reuses tabs keyed by the OpenAI `user` field
+(`conversation_hint`). Standard frontends usually do not send `user`, so
+anonymous requests used to latch onto each other's threads. The empty-hint
+hole is fixed (see below); the redesign below is deferred, do it later.
+
+### F1 Stateless-by-default chat · P2
+- Every request opens a new thread and sends the full flattened history, so
+  behaviour matches OpenAI's stateless contract and can never cross-talk.
+- Cost: multi-turn requests resend history (roughly (N+1)/2x tokens for N
+  rounds) plus per-request thread-creation latency.
+
+### F2 Stateful tab reuse as explicit opt-in · P2
+- Only reuse a tab's thread when the client passes a non-empty `user`, and
+  document `user` as the conversation key. Anonymous requests always take
+  the F1 path.
+
+### F3 Multi-user guidance · P3
+- Document raising `account_max_concurrency` so parallel conversations get
+  separate tabs instead of wiping each other on one tab, and consider
+  isolating tabs by API key as well as by `user`.
+
+**Done (2026-10-28, local, unpushed)**: anonymous requests never continue a
+thread — `_begin_chat` prefers a stateless tab when `conversation_hint` is
+empty, and the follow-up delta is only computed for a non-empty hint.
+Regression tests in `tests/test_browser_tabs.py`.
