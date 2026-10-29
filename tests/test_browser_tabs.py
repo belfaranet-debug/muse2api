@@ -352,3 +352,42 @@ async def _ready(value):
 
 async def _noop(*args, **kwargs):
     return None
+
+
+# ---- opening a blank thread ----
+
+class _NavSession(_FakeSession):
+    """A muse.ai page whose router either lands on an empty /thread/new or is missing."""
+
+    def __init__(self, router: bool) -> None:
+        self.router = router
+        self.sent: list[str] = []
+
+    async def evaluate(self, expr, **_):
+        from muse2api.drivers.browser import dom
+
+        if expr == dom.SOFT_NEW_THREAD:
+            return self.router
+        if expr == dom.FRESH_THREAD:
+            return True
+        if expr == dom.PAGE_STATE:
+            return {"ready": True}
+        return {}
+
+    async def send(self, method, params=None, **_):
+        self.sent.append(method)
+        return {}
+
+
+async def test_new_thread_uses_the_page_router_without_reloading(driver, fast):
+    tab = _Tab("a0", "ctx", "t", _NavSession(router=True))
+    tab.turns, tab.thread_url = [("user", "hi")], "https://muse.ai/thread/x"
+    await driver._new_thread(tab)
+    assert tab.session.sent == []
+    assert not tab.has_state
+
+
+async def test_new_thread_falls_back_to_a_full_navigation(driver, fast):
+    tab = _Tab("a0", "ctx", "t", _NavSession(router=False))
+    await driver._new_thread(tab)
+    assert tab.session.sent == ["Page.navigate"]

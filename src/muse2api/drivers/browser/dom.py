@@ -44,6 +44,23 @@ PAGE_STATE = f"""(() => {{
   }};
 }})()"""
 
+# Open a blank thread through the page's own Next.js router. A full Page.navigate
+# reloads the app, and the first reply on a reloaded page waits for the workspace
+# connection to be re-established. Returns false when the router is not available.
+SOFT_NEW_THREAD = """(() => {
+  const router = window.next && window.next.router;
+  if (!location.hostname.endsWith('muse.ai') || !router || typeof router.push !== 'function') return false;
+  router.push('/thread/new');
+  return true;
+})()"""
+
+# The soft navigation has landed: a ready, empty /thread/new page.
+FRESH_THREAD = f"""(() => {{
+  const page = {PAGE_STATE};
+  return page.ready && page.path === '/thread/new'
+         && document.querySelectorAll({q(AGENT_BUBBLE)}).length === 0;
+}})()"""
+
 # Snapshot of the conversation used to detect new output after sending.
 CHAT_STATE = f"""(() => {{
   const scrollers = [...document.querySelectorAll('*')].filter(e => {{

@@ -356,8 +356,25 @@ class BrowserDriver(MuseDriver):
             return False
         return (state.get("agentCount") or 0) < HOT_BUBBLE_LIMIT
 
+    _SOFT_NAV_TIMEOUT = 8.0
+
+    async def _soft_new_thread(self, tab: _Tab) -> bool:
+        """Switch an already loaded muse.ai page to a blank thread without reloading it.
+        False means the caller should fall back to a full navigation."""
+        with contextlib.suppress(CDPError, TimeoutError):
+            if not await tab.session.evaluate(dom.SOFT_NEW_THREAD, timeout=5.0):
+                return False
+            deadline = time.monotonic() + self._SOFT_NAV_TIMEOUT
+            while time.monotonic() < deadline:
+                await asyncio.sleep(0.25)
+                if await tab.session.evaluate(dom.FRESH_THREAD, timeout=5.0):
+                    return True
+        return False
+
     async def _new_thread(self, tab: _Tab) -> None:
         self._forget(tab)
+        if await self._soft_new_thread(tab):
+            return
         await tab.session.send("Page.navigate", {"url": muse.NEW_THREAD_URL})
         deadline = time.monotonic() + self.settings.page_ready_timeout
         state: dict = {}
