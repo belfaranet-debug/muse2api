@@ -55,6 +55,14 @@ def require_api_key(request: Request) -> None:
     _identify(request, key.id, key.name)
 
 
+def conversation_key(request: Request, user: str | None) -> str | None:
+    """The browser driver continues a muse.ai thread only for a non-empty key. Scoping
+    ``user`` by the API key keeps two keys that send the same ``user`` apart."""
+    if not user:
+        return None
+    return f"{getattr(request.state, 'key_id', '')}:{user}"
+
+
 def require_admin_key(request: Request) -> None:
     _check(_bearer(request), get_services(request).settings.effective_admin_key)
 

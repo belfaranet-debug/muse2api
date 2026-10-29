@@ -485,7 +485,7 @@ class BrowserDriver(MuseDriver):
         try:
             # The saved conversation (restored after a restart) may only go into a
             # tab while no other tab of the account already holds a conversation.
-            if not any(t.has_state for t in self._tabs.get(account.id, []) if t is not tab):
+            if hint and not any(t.has_state for t in self._tabs.get(account.id, []) if t is not tab):
                 self._load_hot(tab, account)
             # An anonymous request never continues a thread, even if the tab
             # it got (e.g. the at-limit fallback, or a restored hot page)
@@ -565,7 +565,9 @@ class BrowserDriver(MuseDriver):
             await self._close_tab(tab)
             raise UpstreamError(f"browser error: {exc}") from exc
         finally:
-            if finished:
+            # Only a named conversation is kept: an anonymous one can never be
+            # continued, so holding it would just keep the tab from counting as fresh.
+            if finished and req.conversation_hint:
                 url = ""
                 for _ in range(10):
                     url = await self._href(tab)

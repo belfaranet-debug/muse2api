@@ -32,9 +32,9 @@ Priorities: **P0** must be done first · **P1** core feature · **P2** better ex
 | E1 | Automatic media cleanup | P2 | `core/media.py` | | Done |
 | E2 | Multiple API keys and rate limiting | P3 | `api/deps.py` | | Partial (per-key management done; rate limiting open) |
 | E3 | Observability (metrics, logs) | P3 | `observability/` (new) | | Not started |
-| F1 | Stateless-by-default chat: new thread + full history per request | P2 | `drivers/browser/driver.py` | | Deferred (2026-10-28, see §F) |
-| F2 | Stateful tab reuse as explicit opt-in (non-empty `user` only) | P2 | `drivers/browser/driver.py` | | Deferred (2026-10-28, see §F) |
-| F3 | Multi-user guidance: raise `account_max_concurrency`, isolate by API key | P3 | `config.py`, docs | | Deferred (2026-10-28, see §F) |
+| F1 | Stateless-by-default chat: new thread + full history per request | P2 | `drivers/browser/driver.py` | | Done |
+| F2 | Stateful tab reuse as explicit opt-in (non-empty `user` only) | P2 | `drivers/browser/driver.py` | | Done |
+| F3 | Multi-user guidance: raise `account_max_concurrency`, isolate by API key | P3 | `api/deps.py`, docs | | Done |
 
 ---
 
@@ -173,12 +173,11 @@ Done. A follow-up whose `messages` continue the conversation already on the page
 
 ---
 
-## F. Conversation state (deferred 2026-10-28)
+## F. Conversation state
 
 Background: the browser driver reuses tabs keyed by the OpenAI `user` field
 (`conversation_hint`). Standard frontends usually do not send `user`, so
-anonymous requests used to latch onto each other's threads. The empty-hint
-hole is fixed (see below); the redesign below is deferred, do it later.
+anonymous requests used to latch onto each other's threads.
 
 ### F1 Stateless-by-default chat · P2
 - Every request opens a new thread and sends the full flattened history, so
@@ -196,7 +195,14 @@ hole is fixed (see below); the redesign below is deferred, do it later.
   separate tabs instead of wiping each other on one tab, and consider
   isolating tabs by API key as well as by `user`.
 
-**Done (2026-10-28, local, unpushed)**: anonymous requests never continue a
-thread — `_begin_chat` prefers a stateless tab when `conversation_hint` is
-empty, and the follow-up delta is only computed for a non-empty hint.
-Regression tests in `tests/test_browser_tabs.py`.
+**Done (2026-10-29)**:
+- F1: anonymous requests never continue a thread. `_begin_chat` prefers a
+  stateless tab, never restores the saved thread into it, and the follow-up
+  delta is only computed for a non-empty hint. After the reply the tab is
+  forgotten and nothing is written to `account.meta["hot_page"]`.
+- F2: only a non-empty `user` keeps the thread for the next turn.
+- F3: the conversation key is `<key_id>:<user>` (`api/deps.py`
+  `conversation_key`), so two API keys sending the same `user` never share a
+  thread. README "Multi-turn conversations" documents `user` and raising
+  `MUSE2API_ACCOUNT_MAX_CONCURRENCY`.
+- Regression tests in `tests/test_browser_tabs.py` and `tests/test_api.py`.

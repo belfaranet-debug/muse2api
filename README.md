@@ -201,6 +201,10 @@ resp = client.chat.completions.create(
 print(resp.choices[0].message.content)
 ```
 
+**Multi-turn conversations**
+
+Chat is stateless by default: each request opens a new muse.ai thread and sends the full `messages` history, so clients never share a thread. Pass a stable `user` to keep one conversation on one thread; follow-ups then send only the new user turn, which is faster. The key is scoped by API key, so two keys sending the same `user` stay apart. For several people talking at once, raise `MUSE2API_ACCOUNT_MAX_CONCURRENCY` (4 works well) so each conversation gets its own tab instead of taking turns on one.
+
 **Text to image**
 
 ```bash

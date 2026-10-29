@@ -29,7 +29,7 @@ from ...core.prompt import flatten_messages, message_turns
 from ...drivers.base import ChatRequest, InputImage
 from ...errors import InvalidRequest, Muse2APIError
 from ...services.container import Services
-from ..deps import get_services, require_api_key
+from ..deps import conversation_key, get_services, require_api_key
 
 log = logging.getLogger(__name__)
 router = APIRouter(tags=["responses"], dependencies=[Depends(require_api_key)])
@@ -129,7 +129,7 @@ async def create_response(body: ResponseRequest, request: Request,
         images=images,
         timeout=svc.settings.chat_timeout,
         first_token_timeout=svc.settings.first_token_timeout,
-        conversation_hint=body.user,
+        conversation_hint=conversation_key(request, body.user),
         turns=message_turns(messages),
         cancel=cancel,
     )

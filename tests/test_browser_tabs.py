@@ -293,3 +293,62 @@ async def test_named_chat_still_continues_its_thread(driver, monkeypatch):
     )
     assert not new_thread
     assert sent == ["more"]  # only the delta, on the same thread
+
+
+async def _finish_chat(driver, fast, monkeypatch, req):
+    """Run chat_stream to a finished reply on a fake thread; returns (tab, account)."""
+    account = Account(id="a1", cookies={"hatch_sess": "x"})
+    tab = _Tab(account.id, "ctx", "t0", _FakeSession())
+    tab.busy = True
+
+    async def begin(acc, r):
+        return tab, {"agentCount": 0, "lastText": ""}
+
+    async def state(t):
+        return {"agentCount": 1, "lastText": "hello", "generating": False}
+
+    async def href(t):
+        return "https://muse.ai/thread/abc"
+
+    monkeypatch.setattr(driver, "_begin_chat", begin)
+    monkeypatch.setattr(driver, "_state", state)
+    monkeypatch.setattr(driver, "_href", href)
+    assert [d async for d in driver.chat_stream(account, req)] == ["hello"]
+    return tab, account
+
+
+async def test_anonymous_reply_is_not_kept(driver, fast, monkeypatch):
+    tab, account = await _finish_chat(driver, fast, monkeypatch,
+                                      ChatRequest(prompt="hi", model="muse-chat", turns=[("user", "hi")]))
+    assert not tab.has_state and not tab.busy
+    assert "hot_page" not in account.meta
+
+
+async def test_named_reply_is_kept_for_the_next_turn(driver, fast, monkeypatch):
+    tab, account = await _finish_chat(
+        driver, fast, monkeypatch,
+        ChatRequest(prompt="hi", model="muse-chat", conversation_hint="k:alice", turns=[("user", "hi")]))
+    assert tab.hint == "k:alice" and tab.thread_url == "https://muse.ai/thread/abc"
+    assert account.meta["hot_page"]["hint"] == "k:alice"
+
+
+async def test_anonymous_chat_does_not_restore_the_saved_thread(driver, monkeypatch):
+    tab = _Tab(ACC.id, "ctx", "t0", _FakeSession())
+    account = Account(id="a2", cookies={"hatch_sess": "x"},
+                      meta={"hot_page": {"hint": "k:alice", "turns": [["user", "hi"]],
+                                         "url": "https://muse.ai/thread/abc", "image_count": 0}})
+    monkeypatch.setattr(driver, "_checkout", lambda acc, prefer=None: _ready(tab))
+    for name in ("_new_thread", "_attach", "_send"):
+        monkeypatch.setattr(driver, name, _noop)
+    monkeypatch.setattr(driver, "_state", lambda t: _ready({}))
+    await driver._begin_chat(account, ChatRequest(prompt="hi", model="muse-chat", turns=[("user", "hi")]))
+    assert not tab.has_state  # alice's saved thread stays out of an anonymous tab
+    assert account.meta["hot_page"]["hint"] == "k:alice"
+
+
+async def _ready(value):
+    return value
+
+
+async def _noop(*args, **kwargs):
+    return None

@@ -204,6 +204,21 @@ def _capture_chat_requests(client, monkeypatch) -> list:
     return seen
 
 
+def test_conversation_key_is_scoped_by_api_key(client, auth, admin, monkeypatch):
+    seen = _capture_chat_requests(client, monkeypatch)
+    other = client.post("/admin/keys", headers=admin, json={"name": "other"}).json()
+    body = {"model": "muse-chat", "user": "alice", "messages": [{"role": "user", "content": "hi"}]}
+    assert client.post("/v1/chat/completions", headers=auth, json=body).status_code == 200
+    assert client.post("/v1/chat/completions", json=body,
+                       headers={"Authorization": f"Bearer {other['api_key']}"}).status_code == 200
+    assert client.post("/v1/responses", headers=auth,
+                       json={"model": "muse-chat", "user": "alice", "input": "hi"}).status_code == 200
+    anon = {"model": "muse-chat", "messages": [{"role": "user", "content": "hi"}]}
+    assert client.post("/v1/chat/completions", headers=auth, json=anon).status_code == 200
+    hints = [r.conversation_hint for r in seen]
+    assert hints == ["legacy:alice", f"{other['key']['id']}:alice", "legacy:alice", None]
+
+
 def test_responses_non_stream_string_input(client, auth):
     r = client.post("/v1/responses", headers=auth, json={"input": "hello"})
     assert r.status_code == 200

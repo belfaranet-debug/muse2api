@@ -201,6 +201,10 @@ resp = client.chat.completions.create(
 print(resp.choices[0].message.content)
 ```
 
+**多轮对话**
+
+对话默认无状态：每个请求都在 muse.ai 开一个新对话，并发送完整的 `messages` 历史，不同客户端不会接进同一个对话。传一个固定的 `user`，同一段对话就会留在同一个对话里，后续只发送新的用户消息，速度更快。这个标识按 API key 隔离，两把 key 传相同的 `user` 也不会混在一起。多人同时使用时，把 `MUSE2API_ACCOUNT_MAX_CONCURRENCY` 调高（4 比较合适），每段对话各用一个标签页，不用在一个标签页上排队。
+
 **文生图**
 
 ```bash
