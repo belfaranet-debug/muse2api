@@ -92,3 +92,11 @@ def test_media_prune_disabled_and_foreign_files(tmp_path):
     # prune with negative threshold never deletes
     assert store.prune(-1) == 0
     assert (tmp_path / "media" / "foreign.txt").exists()
+
+
+def test_blank_browser_profile_dir_falls_back_to_data_dir(tmp_path, monkeypatch):
+    from muse2api.config import Settings
+
+    monkeypatch.setenv("MUSE2API_BROWSER_PROFILE_DIR", "")
+    settings = Settings(_env_file=None, data_dir=tmp_path)
+    assert settings.profile_dir == tmp_path / "browser-profile"

@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DriverName = Literal["mock", "browser", "http"]
@@ -90,6 +90,15 @@ class Settings(BaseSettings):
     # --- keepalive (session renewal) ---
     keepalive_enabled: bool = True
     keepalive_interval: float = 600
+
+    @field_validator("browser_profile_dir", mode="before")
+    @classmethod
+    def _blank_profile_dir_is_unset(cls, value: object) -> object:
+        """``.env.example`` ships ``MUSE2API_BROWSER_PROFILE_DIR=``; ``Path("")`` would be the
+        working directory, so Chrome would scatter its profile across the repo root."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
     @property
     def media_dir(self) -> Path:
