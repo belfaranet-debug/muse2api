@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     browser_profile_dir: Path | None = None
     page_ready_timeout: float = 45.0
     warm_threads: int = Field(
-        default=0,
+        default=2,
         description="Pre-started muse.ai threads kept per account. A new thread takes muse.ai "
         "20-40s to answer its first message, a started one about 5s, so a chat that opens a new "
         "thread goes into a warm one instead. Each costs one extra short message of quota. "
@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     # --- account pool ---
     pool_strategy: PoolStrategyName = "affinity"
     pool_acquire_timeout: float = 60.0
-    account_max_concurrency: int = 1
+    account_max_concurrency: int = 4
     account_cooldown: float = 120.0
     max_failover: int = 2
 

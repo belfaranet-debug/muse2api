@@ -203,7 +203,7 @@ print(resp.choices[0].message.content)
 
 **多轮对话**
 
-对话默认无状态：每个请求都在 muse.ai 开一个新对话，并发送完整的 `messages` 历史，不同客户端不会接进同一个对话。传一个固定的 `user`，同一段对话就会留在同一个对话里，后续只发送新的用户消息，速度更快。这个标识按 API key 隔离，两把 key 传相同的 `user` 也不会混在一起。多人同时使用时，把 `MUSE2API_ACCOUNT_MAX_CONCURRENCY` 调高（4 比较合适），每段对话各用一个标签页，不用在一个标签页上排队。
+对话默认无状态：每个请求都在 muse.ai 开一个新对话，并发送完整的 `messages` 历史，不同客户端不会接进同一个对话。传一个固定的 `user`，同一段对话就会留在同一个对话里，后续只发送新的用户消息，速度更快。这个标识按 API key 隔离，两把 key 传相同的 `user` 也不会混在一起。每个账号同时服务 `MUSE2API_ACCOUNT_MAX_CONCURRENCY` 段对话（默认 4），每段一个标签页；并预先开好 `MUSE2API_WARM_THREADS` 个对话（默认 2），新对话约 5 秒就能回复，而不是 20～40 秒。每个 muse.ai 账号只有一台云端虚拟机，同一账号上的多段对话会互相拖慢：实测一个账号一次一个请求约 5 秒，同时三个各约 20 秒，同时十个要 33～95 秒并有超时。给一个账号多开标签页没有用；10 人左右请准备 3 个以上账号，账号池会把请求分摊过去。
 
 **文生图**
 
@@ -329,8 +329,8 @@ muse.ai 的会话 cookie 都是 httpOnly，页面脚本读不到；一个小小�
 | `MUSE2API_PUBLIC_BASE` | 空 | 媒体链接的公开 base URL；空时从请求推导 |
 | `MUSE2API_POOL_STRATEGY` | `lru` | 账号调度：`lru` / `round_robin` / `affinity` |
 | `MUSE2API_MAX_FAILOVER` | `2` | 换账号重试的最大次数 |
-| `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | 每个账号的并行请求数（browser driver：每请求一个 tab）；4 比较好用 |
-| `MUSE2API_WARM_THREADS` | `0` | 每个账号预先开好的对话数。muse.ai 新对话的第一条回复要 20～40 秒，已开好的对话约 5 秒，所以需要新对话的请求会放进预热好的对话里。每个预热对话多花一条短消息的额度；并发至少要 2 |
+| `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `4` | 每个账号的并行请求数（browser driver：每请求一个 tab，每个 tab 约占 300 MB 内存） |
+| `MUSE2API_WARM_THREADS` | `2` | 每个账号预先开好的对话数。muse.ai 新对话的第一条回复要 20～40 秒，已开好的对话约 5 秒，所以需要新对话的请求会放进预热好的对话里。每个预热对话多花一条短消息的额度；并发至少要 2 |
 | `MUSE2API_CHROMIUM_PATH` | 自动探测 | 浏览器可执行文件路径 |
 | `MUSE2API_KEEPALIVE_ENABLED` | `true` | 后台定期续期会话并唤醒各账号的 VM |
 | `MUSE2API_KEEPALIVE_INTERVAL` | `600` | 两轮保活之间的秒数 |

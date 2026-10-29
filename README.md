@@ -203,7 +203,7 @@ print(resp.choices[0].message.content)
 
 **Multi-turn conversations**
 
-Chat is stateless by default: each request opens a new muse.ai thread and sends the full `messages` history, so clients never share a thread. Pass a stable `user` to keep one conversation on one thread; follow-ups then send only the new user turn, which is faster. The key is scoped by API key, so two keys sending the same `user` stay apart. For several people talking at once, raise `MUSE2API_ACCOUNT_MAX_CONCURRENCY` (4 works well) so each conversation gets its own tab instead of taking turns on one.
+Chat is stateless by default: each request opens a new muse.ai thread and sends the full `messages` history, so clients never share a thread. Pass a stable `user` to keep one conversation on one thread; follow-ups then send only the new user turn, which is faster. The key is scoped by API key, so two keys sending the same `user` stay apart. Each account serves `MUSE2API_ACCOUNT_MAX_CONCURRENCY` conversations at once (default 4), one tab each, and keeps `MUSE2API_WARM_THREADS` started threads (default 2) so a new conversation answers in about 5s instead of 20-40s. Each muse.ai account runs on one cloud VM, and conversations on the same account slow each other down: measured on one account, one request at a time took about 5s, three at once about 20s each, and ten at once 33-95s with a timeout. More tabs per account do not help; for about 10 people use 3 or more accounts, which the pool spreads requests across.
 
 **Text to image**
 
@@ -329,8 +329,8 @@ All settings come from environment variables (prefix `MUSE2API_`) or a `.env` fi
 | `MUSE2API_PUBLIC_BASE` | empty | Public base URL used in media links; derived from the request when empty |
 | `MUSE2API_POOL_STRATEGY` | `lru` | Account scheduling: `lru` / `round_robin` / `affinity` |
 | `MUSE2API_MAX_FAILOVER` | `2` | Maximum number of retries on another account |
-| `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | Parallel requests per account (browser driver: one tab each); 4 works well |
-| `MUSE2API_WARM_THREADS` | `0` | Pre-started threads kept per account. A new muse.ai thread takes 20-40s to answer its first message, a started one about 5s, so chats that need a new thread go into a warm one. Each costs one extra short message of quota; needs a concurrency of at least 2 |
+| `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `4` | Parallel requests per account (browser driver: one tab each, about 300 MB of memory per tab) |
+| `MUSE2API_WARM_THREADS` | `2` | Pre-started threads kept per account. A new muse.ai thread takes 20-40s to answer its first message, a started one about 5s, so chats that need a new thread go into a warm one. Each costs one extra short message of quota; needs a concurrency of at least 2 |
 | `MUSE2API_CHROMIUM_PATH` | auto-detected | Path to the browser executable |
 | `MUSE2API_KEEPALIVE_ENABLED` | `true` | Periodically renew sessions and wake each account's VM in the background |
 | `MUSE2API_KEEPALIVE_INTERVAL` | `600` | Seconds between keepalive rounds |

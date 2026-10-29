@@ -492,3 +492,18 @@ async def test_new_named_conversation_takes_the_warm_tab_not_a_new_one(driver):
         await driver._begin_chat(ACC, ChatRequest(prompt="hi", model="muse-chat",
                                                   conversation_hint="k:bob", turns=[("user", "hi")]))
     assert taken == [warm]
+
+
+async def test_missing_warm_threads_are_taken_together(tmp_path, monkeypatch):
+    drv = BrowserDriver(Settings(_env_file=None, data_dir=tmp_path, account_max_concurrency=6,
+                                 warm_threads=3))
+    ids = itertools.count()
+
+    async def fake_open(account):
+        return _Tab(account.id, "ctx", f"t{next(ids)}", _FakeSession())
+
+    monkeypatch.setattr(drv, "_open_tab", fake_open)
+    batch = []
+    while (tab := await drv._checkout_for_warming(ACC, len(batch))) is not None:
+        batch.append(tab)
+    assert len(batch) == 3 and len({t.target_id for t in batch}) == 3

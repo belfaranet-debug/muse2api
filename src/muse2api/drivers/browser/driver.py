@@ -633,26 +633,39 @@ class BrowserDriver(MuseDriver):
         self._warming[account.id] = asyncio.create_task(self._fill_warm(account))
 
     async def _fill_warm(self, account: Account) -> None:
-        while (tab := await self._checkout_for_warming(account)) is not None:
-            try:
-                await self._warm_up(tab)
-            except Exception as exc:  # noqa: BLE001
-                self._forget(tab)
-                if isinstance(exc, CDPError):
-                    await self._close_tab(tab)
-                log.warning("warming a thread for %s failed: %s", account.id, exc)
+        """Warm the missing threads in parallel, round after round, until the account has
+        enough or a round fails."""
+        while True:
+            batch: list[_Tab] = []
+            while (tab := await self._checkout_for_warming(account, len(batch))) is not None:
+                batch.append(tab)
+            if not batch:
                 return
-            finally:
-                await self._checkin(tab)
-            log.info("warm thread ready for account %s", account.id)
+            results = await asyncio.gather(*(self._warm_one(account, t) for t in batch))
+            if not all(results):
+                return
 
-    async def _checkout_for_warming(self, account: Account) -> _Tab | None:
-        """A tab to warm, but only while the account has enough warm threads missing and
-        a slot is still left for a real request afterwards."""
+    async def _warm_one(self, account: Account, tab: _Tab) -> bool:
+        try:
+            await self._warm_up(tab)
+        except Exception as exc:  # noqa: BLE001
+            self._forget(tab)
+            if isinstance(exc, CDPError):
+                await self._close_tab(tab)
+            log.warning("warming a thread for %s failed: %s", account.id, exc)
+            return False
+        finally:
+            await self._checkin(tab)
+        log.info("warm thread ready for account %s", account.id)
+        return True
+
+    async def _checkout_for_warming(self, account: Account, pending: int = 0) -> _Tab | None:
+        """A tab to warm, but only while the account has warm threads missing (counting
+        the ``pending`` ones being warmed) and a slot is still left for a real request."""
         limit = max(1, self.settings.account_max_concurrency)
         async with self._tab_cond:
             tabs = [t for t in self._tabs.get(account.id, []) if not t.closed]
-            if sum(t.warm for t in tabs) >= self.settings.warm_threads:
+            if sum(t.warm for t in tabs) + pending >= self.settings.warm_threads:
                 return None
             idle = [t for t in tabs if not (t.busy or t.stale or t.session.closed)]
             free = len(idle) + limit - len(tabs) - self._opening.get(account.id, 0)
