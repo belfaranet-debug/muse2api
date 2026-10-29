@@ -56,7 +56,7 @@ muse2api 把 muse.ai 的聊天、文生图和文生视频能力变成标准的 O
 | Admin API（账号增删改查、续期、重置、状态） | ✅ 已实现 | 支持 cookie 字典、原始 `Cookie` 请求头字符串、EditThisCookie JSON 三种导入格式，还有批量导入接口 `/admin/accounts/import`；单账号额度快照 `/admin/accounts/{id}/quota` |
 | Mock driver | ✅ 已实现 | 离线假数据 |
 | 浏览器 driver（Chromium + CDP） | 🧪 待实测 | 聊天、图片、视频全流程已写好 |
-| 会话续期 / 保活 | 🧪 待实测 | 纯 HTTP，默认关闭 |
+| 会话续期 / 保活 | 🧪 待实测 | 纯 HTTP，默认开启，每 10 分钟一次；同时唤醒账号的 VM，第一条请求不用等冷启动 |
 | 直连 HTTP 协议 driver | 🚧 预留 | 返回 501 |
 | `/v1/images/edits`（参考图） | ✅ 已实现 | 参考图用于生成新图；不支持 `mask` |
 | `/v1/responses` | 🚧 预留 | 返回 501 |
@@ -331,7 +331,8 @@ muse.ai 的会话 cookie 都是 httpOnly，页面脚本读不到；一个小小�
 | `MUSE2API_MAX_FAILOVER` | `2` | 换账号重试的最大次数 |
 | `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | 每个账号的并行请求数（browser driver：每请求一个 tab）；4 比较好用 |
 | `MUSE2API_CHROMIUM_PATH` | 自动探测 | 浏览器可执行文件路径 |
-| `MUSE2API_KEEPALIVE_ENABLED` | `false` | 后台定期续期会话 |
+| `MUSE2API_KEEPALIVE_ENABLED` | `true` | 后台定期续期会话并唤醒各账号的 VM |
+| `MUSE2API_KEEPALIVE_INTERVAL` | `600` | 两轮保活之间的秒数 |
 | `MUSE2API_WAKE_CONFIRM_S` | `20` | 唤醒 VM 后最多等多少秒让它报告 `RUNNING` |
 | `MUSE2API_QUOTA_CACHE_S` | `1800` | 额度读数复用多久（秒），过期后才重新问 muse.ai |
 | `MUSE2API_MATTING_MODEL` | `birefnet-general` | `background: "transparent"` 用的抠图模型（`birefnet-general-lite` 更快） |

@@ -56,7 +56,7 @@ The project focuses on **clean engineering and easy collaboration**:
 | Admin API (account CRUD, renewal, reset, status) | ✅ Implemented | Accepts cookie dicts, raw `Cookie` header strings and EditThisCookie JSON, plus bulk import via `/admin/accounts/import`; per-account quota snapshot at `/admin/accounts/{id}/quota` |
 | Mock driver | ✅ Implemented | Offline fake data |
 | Browser driver (Chromium + CDP) | 🧪 Needs live testing | Full chat, image and video flows are written |
-| Session renewal / keepalive | 🧪 Needs live testing | Plain HTTP, disabled by default |
+| Session renewal / keepalive | 🧪 Needs live testing | Plain HTTP, on by default every 10 min; also wakes the account's VM so the first request is not slowed by a cold start |
 | Direct HTTP protocol driver | 🚧 Reserved | Returns 501 |
 | `/v1/images/edits` (reference images) | ✅ Implemented | Images are references for a new image; `mask` is rejected |
 | `/v1/responses` | 🚧 Reserved | Returns 501 |
@@ -331,7 +331,8 @@ All settings come from environment variables (prefix `MUSE2API_`) or a `.env` fi
 | `MUSE2API_MAX_FAILOVER` | `2` | Maximum number of retries on another account |
 | `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | Parallel requests per account (browser driver: one tab each); 4 works well |
 | `MUSE2API_CHROMIUM_PATH` | auto-detected | Path to the browser executable |
-| `MUSE2API_KEEPALIVE_ENABLED` | `false` | Periodically renew sessions in the background |
+| `MUSE2API_KEEPALIVE_ENABLED` | `true` | Periodically renew sessions and wake each account's VM in the background |
+| `MUSE2API_KEEPALIVE_INTERVAL` | `600` | Seconds between keepalive rounds |
 | `MUSE2API_WAKE_CONFIRM_S` | `20` | Seconds to wait for a woken VM to report `RUNNING` |
 | `MUSE2API_QUOTA_CACHE_S` | `1800` | How long a quota reading is reused before muse.ai is asked again |
 | `MUSE2API_MATTING_MODEL` | `birefnet-general` | Model for `background: "transparent"` (`birefnet-general-lite` is faster) |
