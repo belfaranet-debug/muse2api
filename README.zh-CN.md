@@ -330,6 +330,7 @@ muse.ai 的会话 cookie 都是 httpOnly，页面脚本读不到；一个小小�
 | `MUSE2API_POOL_STRATEGY` | `lru` | 账号调度：`lru` / `round_robin` / `affinity` |
 | `MUSE2API_MAX_FAILOVER` | `2` | 换账号重试的最大次数 |
 | `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | 每个账号的并行请求数（browser driver：每请求一个 tab）；4 比较好用 |
+| `MUSE2API_WARM_THREADS` | `0` | 每个账号预先开好的对话数。muse.ai 新对话的第一条回复要 20～40 秒，已开好的对话约 5 秒，所以需要新对话的请求会放进预热好的对话里。每个预热对话多花一条短消息的额度；并发至少要 2 |
 | `MUSE2API_CHROMIUM_PATH` | 自动探测 | 浏览器可执行文件路径 |
 | `MUSE2API_KEEPALIVE_ENABLED` | `true` | 后台定期续期会话并唤醒各账号的 VM |
 | `MUSE2API_KEEPALIVE_INTERVAL` | `600` | 两轮保活之间的秒数 |

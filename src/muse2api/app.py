@@ -15,6 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from . import __version__
+from .accounts import AccountStatus
 from .accounts.keepalive import keepalive_loop
 from .api.middleware import RequestLogMiddleware
 from .api.routes import build_router
@@ -57,6 +58,9 @@ def create_app(settings: Settings | None = None, driver: MuseDriver | None = Non
         await services.requests.prune(settings.request_log_retention_days)
         await services.requests.backfill_tasks(services.tasks.list(limit=services.tasks.max_kept))
         await services.driver.startup()
+        for acc in services.pool.all():
+            if acc.enabled and acc.status != AccountStatus.INVALID:
+                services.driver.prewarm(acc)
         housekeeping = asyncio.create_task(_housekeeping(services))
         keepalive = None
         if settings.keepalive_enabled and services.driver.capabilities.renew_session:

@@ -391,3 +391,104 @@ async def test_new_thread_falls_back_to_a_full_navigation(driver, fast):
     tab = _Tab("a0", "ctx", "t", _NavSession(router=False))
     await driver._new_thread(tab)
     assert tab.session.sent == ["Page.navigate"]
+
+
+# ---- warm threads ----
+
+async def test_chat_goes_into_a_warm_thread_without_opening_one(driver, monkeypatch):
+    tab = _Tab(ACC.id, "ctx", "t0", _FakeSession())
+    tab.warm = True
+    sent, new_thread, _ = await _run_begin_chat(
+        driver, monkeypatch, tab,
+        ChatRequest(prompt="FULL", model="muse-chat", turns=[("user", "hi")]),
+    )
+    assert not new_thread
+    assert sent == ["FULL"]
+    assert not tab.warm  # used up
+
+
+async def test_checkout_hands_out_a_warm_tab_first(driver):
+    cold, warm = await driver._checkout(ACC), await driver._checkout(ACC)
+    warm.warm = True
+    await driver._checkin(cold)
+    await driver._checkin(warm)
+    assert await driver._checkout(ACC, prefer=lambda t: not t.has_state) is warm
+
+
+async def test_media_leaves_a_warm_tab_alone(driver, monkeypatch):
+    warm = await driver._checkout(ACC)
+    warm.warm = True
+    await driver._checkin(warm)
+    taken = []
+
+    async def prepare(tab, prompt, images):
+        taken.append(tab)
+        raise RuntimeError("stop")
+
+    monkeypatch.setattr(driver, "_prepare", prepare)
+    with pytest.raises(RuntimeError):
+        await driver._generate(ACC, "a cat", [], "image", 1, None, None)
+    assert taken and taken[0] is not warm and warm.warm
+
+
+async def test_warming_keeps_a_slot_free_for_real_requests(tmp_path, monkeypatch):
+    drv = BrowserDriver(Settings(_env_file=None, data_dir=tmp_path, account_max_concurrency=2,
+                                 warm_threads=1))
+    ids = itertools.count()
+
+    async def fake_open(account):
+        return _Tab(account.id, "ctx", f"t{next(ids)}", _FakeSession())
+
+    monkeypatch.setattr(drv, "_open_tab", fake_open)
+    busy = await drv._checkout(ACC)
+    assert await drv._checkout_for_warming(ACC) is None  # one slot left: keep it for a request
+    await drv._checkin(busy)
+    tab = await drv._checkout_for_warming(ACC)
+    assert tab is not None and tab.busy
+    tab.warm = True
+    await drv._checkin(tab)
+    assert await drv._checkout_for_warming(ACC) is None  # enough warm threads
+
+
+class _CookieSession(_FakeSession):
+    def __init__(self) -> None:
+        self.cookies: dict[str, str] = {}
+
+    async def send(self, method, params=None, **_):
+        if method == "Network.setCookie":
+            self.cookies[params["name"]] = params["value"]
+        return {}
+
+
+async def test_renewal_rotates_cookies_in_place_and_keeps_tabs(driver, monkeypatch):
+    from muse2api.drivers.base import SessionInfo
+    from muse2api.drivers.browser import driver as mod
+
+    async def renew(cookies, **_):
+        return SessionInfo(ok=True, cookies={"hatch_sess": "rotated"})
+
+    monkeypatch.setattr(mod.muse, "renew_session", renew)
+    tab = await driver._checkout(ACC)
+    tab.session = _CookieSession()
+    tab.warm = True
+    await driver._checkin(tab)
+    await driver.renew_session(ACC)
+    assert tab.session.cookies["hatch_sess"] == "rotated"
+    assert not tab.closed and not tab.stale and tab.warm
+
+
+async def test_new_named_conversation_takes_the_warm_tab_not_a_new_one(driver):
+    warm = await driver._checkout(ACC)
+    warm.warm = True
+    await driver._checkin(warm)
+    taken = []
+
+    async def stop(t):
+        taken.append(t)
+        raise RuntimeError("stop")
+
+    driver._state = stop
+    with pytest.raises(RuntimeError):
+        await driver._begin_chat(ACC, ChatRequest(prompt="hi", model="muse-chat",
+                                                  conversation_hint="k:bob", turns=[("user", "hi")]))
+    assert taken == [warm]

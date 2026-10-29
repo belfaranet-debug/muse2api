@@ -330,6 +330,7 @@ All settings come from environment variables (prefix `MUSE2API_`) or a `.env` fi
 | `MUSE2API_POOL_STRATEGY` | `lru` | Account scheduling: `lru` / `round_robin` / `affinity` |
 | `MUSE2API_MAX_FAILOVER` | `2` | Maximum number of retries on another account |
 | `MUSE2API_ACCOUNT_MAX_CONCURRENCY` | `1` | Parallel requests per account (browser driver: one tab each); 4 works well |
+| `MUSE2API_WARM_THREADS` | `0` | Pre-started threads kept per account. A new muse.ai thread takes 20-40s to answer its first message, a started one about 5s, so chats that need a new thread go into a warm one. Each costs one extra short message of quota; needs a concurrency of at least 2 |
 | `MUSE2API_CHROMIUM_PATH` | auto-detected | Path to the browser executable |
 | `MUSE2API_KEEPALIVE_ENABLED` | `true` | Periodically renew sessions and wake each account's VM in the background |
 | `MUSE2API_KEEPALIVE_INTERVAL` | `600` | Seconds between keepalive rounds |

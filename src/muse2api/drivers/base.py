@@ -33,7 +33,7 @@ class ChatRequest:
     model: str
     images: list[InputImage] = field(default_factory=list)
     timeout: float = 300.0
-    first_token_timeout: float = 45.0
+    first_token_timeout: float = 75.0
     conversation_hint: str | None = None
     turns: list[tuple[str, str]] = field(default_factory=list)
     """Role/text pairs of the request, used to continue a hot page instead of resending history."""
@@ -104,6 +104,9 @@ class MuseDriver(ABC):
 
     async def shutdown(self) -> None:  # noqa: B027
         """Release resources acquired in ``startup``."""
+
+    def prewarm(self, account: Account) -> None:  # noqa: B027
+        """Start getting ``account`` ready for its first request in the background."""
 
     async def health(self) -> dict[str, Any]:
         return {"driver": self.name, "ok": True}
