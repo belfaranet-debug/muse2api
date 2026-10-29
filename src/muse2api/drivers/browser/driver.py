@@ -622,6 +622,8 @@ class BrowserDriver(MuseDriver):
 
     # ------------------------------------------------------------ warm threads
     _WARM_REPLY_TIMEOUT = 90.0
+    _WARM_RETRY_DELAY = 60.0
+    _WARM_MAX_FAILED_ROUNDS = 3
 
     def prewarm(self, account: Account) -> None:
         """Top up ``account``'s warm threads in the background (``MUSE2API_WARM_THREADS``)."""
@@ -634,7 +636,9 @@ class BrowserDriver(MuseDriver):
 
     async def _fill_warm(self, account: Account) -> None:
         """Warm the missing threads in parallel, round after round, until the account has
-        enough or a round fails."""
+        enough. A failed round (a cold page load often times out) is retried after a
+        pause, up to ``_WARM_MAX_FAILED_ROUNDS`` in a row."""
+        failed = 0
         while True:
             batch: list[_Tab] = []
             while (tab := await self._checkout_for_warming(account, len(batch))) is not None:
@@ -642,8 +646,13 @@ class BrowserDriver(MuseDriver):
             if not batch:
                 return
             results = await asyncio.gather(*(self._warm_one(account, t) for t in batch))
-            if not all(results):
+            if all(results):
+                failed = 0
+                continue
+            failed += 1
+            if failed >= self._WARM_MAX_FAILED_ROUNDS:
                 return
+            await asyncio.sleep(self._WARM_RETRY_DELAY)
 
     async def _warm_one(self, account: Account, tab: _Tab) -> bool:
         try:

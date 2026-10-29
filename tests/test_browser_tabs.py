@@ -507,3 +507,26 @@ async def test_missing_warm_threads_are_taken_together(tmp_path, monkeypatch):
     while (tab := await drv._checkout_for_warming(ACC, len(batch))) is not None:
         batch.append(tab)
     assert len(batch) == 3 and len({t.target_id for t in batch}) == 3
+
+
+async def test_a_failed_warm_round_is_retried(tmp_path, monkeypatch, fast):
+    drv = BrowserDriver(Settings(_env_file=None, data_dir=tmp_path, account_max_concurrency=4,
+                                 warm_threads=1))
+    ids = itertools.count()
+
+    async def fake_open(account):
+        return _Tab(account.id, "ctx", f"t{next(ids)}", _FakeSession())
+
+    attempts = []
+
+    async def warm_up(tab):
+        attempts.append(tab)
+        if len(attempts) == 1:
+            raise RuntimeError("page did not become ready")
+        tab.warm = True
+
+    monkeypatch.setattr(drv, "_open_tab", fake_open)
+    monkeypatch.setattr(drv, "_warm_up", warm_up)
+    await drv._fill_warm(ACC)
+    assert len(attempts) == 2
+    assert sum(t.warm for t in drv._tabs[ACC.id]) == 1
